@@ -101,6 +101,7 @@ fun StreamScreen(activity: StreamActivity) {
             FullscreenControlRoute(
                 scrcpy = scrcpy,
                 onBack = activity::finish,
+                onReceiverBack = if (activity.tvReceiverMode) activity::showTvMenu else null,
                 isInPip = isInPip,
                 onVideoBoundsInWindowChanged = {
                     // 记录下一次进入 PiP 时可用的 sourceRectHint
@@ -115,6 +116,7 @@ fun StreamScreen(activity: StreamActivity) {
 fun FullscreenControlRoute(
     scrcpy: Scrcpy,
     onBack: () -> Unit,
+    onReceiverBack: (() -> Unit)? = null,
     isInPip: Boolean = false,
     autoExitOnStop: Boolean = false,
     onVideoBoundsInWindowChanged: (Rect?) -> Unit = {},
@@ -155,6 +157,7 @@ fun FullscreenControlRoute(
     FullscreenControlScreen(
         scrcpy = scrcpy,
         onBack = onBack,
+        onReceiverBack = onReceiverBack,
         isInPip = isInPip,
         onVideoSizeChanged = { width, height ->
             if (!isInPip) {

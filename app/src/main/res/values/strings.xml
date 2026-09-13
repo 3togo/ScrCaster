@@ -648,4 +648,7 @@
     <string name="language_english">English</string>
     <string name="language_chinese">Chinese</string>
 
+    <string name="tv_remote_accessibility_label">ScrCaster remote key handler</string>
+    <string name="tv_remote_accessibility_description">Lets the TV remote Back button open ScrCaster playback controls. It does not read screen content.</string>
+
 </resources>

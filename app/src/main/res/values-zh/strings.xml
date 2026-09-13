@@ -638,4 +638,7 @@
     <string name="language_english">英语</string>
     <string name="language_chinese">中文</string>
 
+    <string name="tv_remote_accessibility_label">ScrCaster 遥控器按键处理</string>
+    <string name="tv_remote_accessibility_description">让电视遥控器返回键打开 ScrCaster 播放控制。不会读取屏幕内容。</string>
+
 </resources>

@@ -11,6 +11,7 @@ import java.net.InetSocketAddress
 import java.net.NetworkInterface
 import java.net.ServerSocket
 import java.net.Socket
+import java.util.ArrayDeque
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -78,6 +79,11 @@ internal object AdbMdnsDiscoverer {
         val resultHost = AtomicReference<String?>(null)
         val discoveryFinished = AtomicBoolean(false)
         val latch = CountDownLatch(1)
+        // Android TV 10 permits only one NsdManager resolve at a time. Phones can advertise a
+        // stale and a live ADB port under duplicate service names, so resolve them sequentially.
+        val resolveLock = Any()
+        val pendingResolves = ArrayDeque<NsdServiceInfo>()
+        var resolveInFlight = false
         val probeExecutor: ExecutorService? = if (requireReachable) {
             Executors.newFixedThreadPool(MAX_CONCURRENT_PROBES) { task ->
                 Thread(task, "adb-mdns-port-probe").apply { isDaemon = true }
@@ -91,6 +97,69 @@ internal object AdbMdnsDiscoverer {
                 resultHost.set(hostAddress)
                 discoveryFinished.set(true)
                 latch.countDown()
+            }
+        }
+
+        lateinit var resolveNext: () -> Unit
+        resolveNext = resolveNext@{
+            val serviceToResolve = synchronized(resolveLock) {
+                if (discoveryFinished.get() || resolveInFlight || pendingResolves.isEmpty()) null
+                else pendingResolves.removeFirst().also { resolveInFlight = true }
+            } ?: return@resolveNext
+
+            fun finishResolve() {
+                synchronized(resolveLock) { resolveInFlight = false }
+                resolveNext()
+            }
+
+            val resolveListener = object : NsdManager.ResolveListener {
+                override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
+                    Log.v(TAG, "resolve failed: ${serviceInfo.serviceName}, error=$errorCode")
+                    finishResolve()
+                }
+
+                override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
+                    try {
+                        if (discoveryFinished.get()) return
+                        val hostAddress = resolvedHostAddress(serviceInfo) ?: return
+                        if (hostAddress.isBlank()) return
+                        if (expectedHost != null && hostAddress != expectedHost) return
+
+                        if (!includeLanDevices) {
+                            val isLocalHost = runCatching {
+                                NetworkInterface.getNetworkInterfaces().asSequence().any { intf ->
+                                    intf.inetAddresses.asSequence().any { addr ->
+                                        addr.hostAddress == hostAddress
+                                    }
+                                }
+                            }.getOrDefault(false)
+                            if (!isLocalHost || !isPortOpened(serviceInfo.port)) return
+                        }
+
+                        if (requireReachable) {
+                            try {
+                                probeExecutor?.execute {
+                                    if (!discoveryFinished.get() &&
+                                        isReachableAdbEndpoint(hostAddress, serviceInfo.port)
+                                    ) accept(hostAddress, serviceInfo.port)
+                                }
+                            } catch (_: RejectedExecutionException) {
+                                // Discovery timed out while this resolve callback was in flight.
+                            }
+                        } else {
+                            accept(hostAddress, serviceInfo.port)
+                        }
+                    } finally {
+                        finishResolve()
+                    }
+                }
+            }
+
+            runCatching {
+                nsdManager.resolveService(serviceToResolve, resolveListener)
+            }.onFailure { error ->
+                Log.w(TAG, "resolveService failed for ${serviceToResolve.serviceName}", error)
+                finishResolve()
             }
         }
 
@@ -118,52 +187,10 @@ internal object AdbMdnsDiscoverer {
                 if (discoveryFinished.get()) return
                 Log.v(TAG, "service found: ${serviceInfo.serviceName}")
                 if (expectedName != null && !matchesAdbServiceName(serviceInfo.serviceName, expectedName)) return
-                val resolveListener = object: NsdManager.ResolveListener {
-                    override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
-                        Log.v(TAG, "resolve failed: ${serviceInfo.serviceName}, error=$errorCode")
-                    }
-
-                    override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
-                        if (discoveryFinished.get()) return
-                        val hostAddress = resolvedHostAddress(serviceInfo) ?: return
-                        if (hostAddress.isBlank()) return
-                        if (expectedHost != null && hostAddress != expectedHost) return
-
-                        if (!includeLanDevices) {
-                            val isLocalHost = runCatching {
-                                NetworkInterface.getNetworkInterfaces().asSequence().any { intf ->
-                                    intf.inetAddresses.asSequence().any { addr ->
-                                        addr.hostAddress == hostAddress
-                                    }
-                                }
-                            }.getOrDefault(false)
-                            if (!isLocalHost) return
-                            if (!isPortOpened(serviceInfo.port)) return
-                        }
-
-                        if (requireReachable) {
-                            // Do not block NsdManager's callback thread while a stale port times out.
-                            try {
-                                probeExecutor?.execute {
-                                    if (!discoveryFinished.get() &&
-                                        isReachableAdbEndpoint(hostAddress, serviceInfo.port)
-                                    ) {
-                                        accept(hostAddress, serviceInfo.port)
-                                    }
-                                }
-                            } catch (_: RejectedExecutionException) {
-                                // Discovery timed out while this resolve callback was in flight.
-                            }
-                        } else {
-                            accept(hostAddress, serviceInfo.port)
-                        }
-                    }
+                synchronized(resolveLock) {
+                    pendingResolves.addLast(serviceInfo)
                 }
-                runCatching {
-                    nsdManager.resolveService(serviceInfo, resolveListener)
-                }.onFailure { e ->
-                    Log.w(TAG, "resolveService failed for ${serviceInfo.serviceName}", e)
-                }
+                resolveNext()
             }
 
             override fun onServiceLost(serviceInfo: NsdServiceInfo) {

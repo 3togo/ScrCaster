@@ -8,6 +8,7 @@ import android.content.Intent
 import android.graphics.drawable.Icon
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
@@ -108,6 +109,13 @@ class StreamActivity: FragmentActivity() {
 
         setContent {
             StreamScreen(activity = this)
+        }
+
+        // Some Android TV firmware handles the remote Back key through the system back
+        // dispatcher without delivering a normal KeyEvent to the Activity. Keep the
+        // dispatchKeyEvent path for remotes that do, and cover the system path here.
+        if (tvReceiverMode) {
+            onBackPressedDispatcher.addCallback(this) { showTvMenu() }
         }
 
         /*
@@ -220,7 +228,7 @@ class StreamActivity: FragmentActivity() {
         return super.dispatchKeyEvent(event)
     }
 
-    private fun showTvMenu() {
+    internal fun showTvMenu() {
         if (tvMenu?.isShowing == true) return
         enqueueTv { release() }
         tvMenu = AlertDialog.Builder(this)
@@ -422,13 +430,27 @@ class StreamActivity: FragmentActivity() {
         private var currentActivityRef: WeakReference<StreamActivity>? = null
 
         fun createIntent(context: Context, tvReceiver: Boolean = false): Intent {
-            return Intent(context, StreamActivity::class.java).putExtra(EXTRA_TV_RECEIVER, tvReceiver)
+            return Intent(context, StreamActivity::class.java)
+                .putExtra(EXTRA_TV_RECEIVER, tvReceiver)
         }
 
         fun dismissActivePictureInPicture() {
             currentActivityRef?.get()
                 ?.takeIf { it.isInPictureInPictureMode }
                 ?.finish()
+        }
+
+        internal fun handleTvBackFromAccessibility(event: KeyEvent): Boolean {
+            val activity = currentActivityRef?.get()
+                ?.takeIf {
+                    it.tvReceiverMode && !it.isFinishing && !it.isDestroyed &&
+                        it.hasWindowFocus()
+                }
+                ?: return false
+            if (event.action == KeyEvent.ACTION_UP && !event.isCanceled) {
+                activity.runOnUiThread { activity.showTvMenu() }
+            }
+            return true
         }
     }
 }

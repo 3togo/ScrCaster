@@ -59,6 +59,7 @@ import top.yukonga.miuix.kmp.basic.Text
 fun FullscreenControlScreen(
     scrcpy: Scrcpy,
     onBack: () -> Unit,
+    onReceiverBack: (() -> Unit)?,
     isInPip: Boolean,
     onVideoSizeChanged: (width: Int, height: Int) -> Unit,
     onVideoBoundsInWindowChanged: (Rect?) -> Unit,
@@ -243,7 +244,9 @@ fun FullscreenControlScreen(
     }
 
     BackHandler(enabled = true) {
-        if (asBundle.fullscreenControlBackToDevice && currentSession != null)
+        if (onReceiverBack != null)
+            onReceiverBack()
+        else if (asBundle.fullscreenControlBackToDevice && currentSession != null)
             taskScope.launch { sendBackOrTurnScreenOn() }
         else onBack()
     }
