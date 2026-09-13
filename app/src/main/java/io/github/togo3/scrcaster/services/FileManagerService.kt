@@ -21,67 +21,6 @@ import java.text.DecimalFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-enum class RemoteFileKind {
-    Directory,
-    Image,
-    Video,
-    Audio,
-    Archive,
-    Apk,
-    Text,
-    Link,
-    Other,
-}
-
-data class RemoteFileEntry(
-    val inode: Long?,
-    val permissions: String,
-    val hardLinks: Int?,
-    val owner: String?,
-    val group: String?,
-    val sizeBytes: Long?,
-    val modifiedAt: LocalDateTime?,
-    val name: String,
-    val fullPath: String,
-    val symlinkTarget: String? = null,
-    val kind: RemoteFileKind,
-    val isDirectory: Boolean,
-)
-
-data class RemoteFileStat(
-    val path: String,
-    val name: String,
-    val typeLabel: String?,
-    val sizeBytes: Long?,
-    val blocks: Long?,
-    val ioBlockBytes: Long?,
-    val inode: Long?,
-    val hardLinks: Int?,
-    val octalMode: String?,
-    val permissions: String?,
-    val uid: Long?,
-    val uidName: String?,
-    val gid: Long?,
-    val gidName: String?,
-    val accessTime: String?,
-    val modifyTime: String?,
-    val changeTime: String?,
-    val device: String?,
-    val deviceType: String?,
-    val symlinkTarget: String?,
-    val rawOutput: String,
-) {
-    val title: String
-        get() = name.ifBlank { path }
-}
-
-data class DirectoryDownloadSnapshot(
-    val remoteRootPath: String,
-    val totalBytes: Long?,
-    val directories: List<String>,
-    val files: List<String>,
-)
-
 object FileManagerService {
     private val listTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
     private val displayTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
