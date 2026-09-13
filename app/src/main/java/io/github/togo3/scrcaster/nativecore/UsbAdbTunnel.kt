@@ -12,6 +12,7 @@ import android.hardware.usb.UsbInterface
 import android.hardware.usb.UsbManager
 import android.os.Build
 import android.util.Log
+import io.github.togo3.scrcaster.util.parcelableExtra
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -187,7 +188,7 @@ class UsbAdbTunnel(
             override fun onReceive(context: Context, intent: Intent) {
                 if (ACTION_USB_PERMISSION == intent.action) {
                     synchronized(this@UsbAdbTunnel) {
-                        val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
+                        val device = intent.parcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
                         val granted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
                         
                         if (device?.deviceId == usbDevice.deviceId) {
@@ -220,7 +221,7 @@ class UsbAdbTunnel(
         detachedReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 if (UsbManager.ACTION_USB_DEVICE_DETACHED == intent.action) {
-                    val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
+                    val device = intent.parcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
                     if (device?.deviceName == usbDevice.deviceName) {
                         Log.i(TAG, "USB device detached: ${usbDevice.deviceName}, closing tunnel")
                         // 走完整 close(): 释放接口, 关闭连接并注销 receiver, 避免资源泄漏

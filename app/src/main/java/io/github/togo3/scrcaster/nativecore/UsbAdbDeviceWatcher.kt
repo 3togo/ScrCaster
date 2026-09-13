@@ -11,6 +11,7 @@ import android.hardware.usb.UsbManager
 import android.os.Build
 import android.util.Log
 import io.github.togo3.scrcaster.core.DeviceRefresh
+import io.github.togo3.scrcaster.util.parcelableExtra
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -85,14 +86,14 @@ class UsbAdbDeviceWatcher(
             override fun onReceive(context: Context, intent: Intent) {
                 when (intent.action) {
                     UsbManager.ACTION_USB_DEVICE_ATTACHED -> {
-                        val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
+                        val device = intent.parcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
                         if (device != null) {
                             handleDeviceAttached(device)
                         }
                     }
                     
                     UsbManager.ACTION_USB_DEVICE_DETACHED -> {
-                        val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
+                        val device = intent.parcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
                         if (device != null) {
                             handleDeviceDetached(device)
                         }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.util.Log
+import io.github.togo3.scrcaster.util.parcelableExtra
 
 /**
  * USB 权限广播接收器
@@ -16,7 +17,7 @@ class UsbPermissionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != ACTION_USB_PERMISSION) return
         
-        val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
+        val device = intent.parcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE)
         val granted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
         
         if (device != null) {

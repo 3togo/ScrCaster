@@ -33,7 +33,7 @@ class AdbSocketStream(
     private val latchOk = AtomicBoolean(false)
     private val queue = LinkedBlockingQueue<Any>()
 
-    // need notifyAll() / wait()
+    // java.lang.Object monitor: wait()/notifyAll() for flow control (Any lacks these)
     private val writeLock = Object()
 
     @Volatile
