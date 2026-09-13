@@ -95,7 +95,7 @@ loop for UI logic.
 # Install the resulting app and androidTest APK on the target TV, then:
 # Run methods separately on boxes that kill the test process between activities.
 for method in manualFieldsLeadToAllActionsAndBack playbackSettingsAndCustomRatioAreReachable validAddressAndKeyboardDoneConnectTheEnteredEndpoint invalidAddressLeavesFormOpenForCorrection qrDialogCanReturnToHomeAction; do
-  adb -s DEVICE shell am instrument -w -e class "io.github.miuzarte.scrcpyforandroid.TvNavigationTest#$method" io.github.togo3.scrcaster.tvdebug.test/androidx.test.runner.AndroidJUnitRunner
+  adb -s DEVICE shell am instrument -w -e class "io.github.togo3.scrcaster.TvNavigationTest#$method" io.github.togo3.scrcaster.tvdebug.test/androidx.test.runner.AndroidJUnitRunner
 done
 ```
 

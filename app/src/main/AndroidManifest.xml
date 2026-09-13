@@ -123,7 +123,7 @@
             android:name=".nativecore.UsbPermissionReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="io.github.miuzarte.scrcpyforandroid.USB_PERMISSION" />
+                <action android:name="io.github.togo3.scrcaster.USB_PERMISSION" />
             </intent-filter>
         </receiver>
 

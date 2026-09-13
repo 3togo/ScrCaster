@@ -119,11 +119,12 @@ Run the Android and Linux checks above, then submit the sync branch to `main`.
 Use a **merge commit** for upstream sync PRs, never squash or rebase them: Git
 must retain the upstream commits as ancestors to make the next sync incremental.
 
-Android source packages and paths stay under
-`io.github.miuzarte.scrcpyforandroid` to minimize upstream conflicts. The
-installed app ID remains `io.github.togo3.scrcaster` (`.tvdebug` for debug), and
-the display name stays ScrCaster. Desktop and shared core code live in their
-own modules under `io.github.togo3.scrcaster`.
+Android source packages and paths now live under `io.github.togo3.scrcaster`,
+matching the installed app ID (`.tvdebug` for debug) and the desktop/core
+modules. Upstream (`Miuzarte/ScrcpyForAndroid`) uses
+`io.github.miuzarte.scrcpyforandroid`, so sync merges that touch package
+declarations or imports may conflict and need resolving. The display name stays
+ScrCaster.
 
 ## Miuix compatibility patch
 

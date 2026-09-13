@@ -25,7 +25,7 @@ val apkBuildTimestamp = LocalDateTime.now()
     .format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
 
 android {
-    namespace = "io.github.miuzarte.scrcpyforandroid"
+    namespace = "io.github.togo3.scrcaster"
     compileSdk = 37
 
     signingConfigs {
