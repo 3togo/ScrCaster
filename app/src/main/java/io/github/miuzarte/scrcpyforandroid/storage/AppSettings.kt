@@ -256,10 +256,10 @@ class AppSettings(context: Context): Settings(context, "AppSettings") {
             booleanPreferencesKey("adb_pairing_auto_discover_on_dialog_open"),
             true,
         )
-        // 摄像头扫码为可选能力, 默认关闭 (不申请相机权限)
+        // 摄像头扫码不在启动时请求权限；首次实际扫码时才请求，因此默认显示入口。
         val ADB_QR_CAMERA_SCAN_ENABLED = Pair(
             booleanPreferencesKey("adb_qr_camera_scan_enabled"),
-            false,
+            true,
         )
         val ADB_AUTO_RECONNECT_PAIRED_DEVICE = Pair(
             booleanPreferencesKey("adb_auto_reconnect_paired_device"),
