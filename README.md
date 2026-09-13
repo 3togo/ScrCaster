@@ -54,6 +54,7 @@
 - 多配置切换，设备绑定配置，连接后直接进入全屏
 - 可替换 scrcpy-server
 - 利用 mDNS 服务实现自动连接启用无线调试的设备、自动发现等待配对设备的IP与端口
+- 二维码配对
 - 自动横竖屏切换
 - 横屏布局
   - 仅屏幕比例小于 16:9 的设备
@@ -160,6 +161,7 @@ specific abi:
 - 画中画实现参考: [ClassicOldSong/moonlight-android](https://github.com/ClassicOldSong/moonlight-android)
 - 原生应用设置页跳转: [YifePlayte/WOMMO](https://github.com/YifePlayte/WOMMO)
 - 终端实现: [reapercanuk39/termux-kotlin-app](https://github.com/reapercanuk39/termux-kotlin-app) (仅 Apache 2.0 部分)
+- 二维码生成: [nayuki/QR-Code-generator](https://github.com/nayuki/QR-Code-generator/tree/master/java)
 
 ## License
 
