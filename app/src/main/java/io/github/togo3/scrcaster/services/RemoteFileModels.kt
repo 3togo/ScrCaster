@@ -1,25 +1,6 @@
 package io.github.togo3.scrcaster.services
 
-import android.content.ContentResolver
-import android.content.Context
-import android.net.Uri
-import android.provider.DocumentsContract
-import android.provider.OpenableColumns
-import android.webkit.MimeTypeMap
-import io.github.togo3.scrcaster.R
-import io.github.togo3.scrcaster.nativecore.AdbSocketStream
-import io.github.togo3.scrcaster.nativecore.NativeAdbService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
-import java.io.Closeable
-import java.io.File
-import java.io.IOException
-import java.nio.charset.StandardCharsets
-import java.text.DecimalFormat
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 enum class RemoteFileKind {
     Directory,
