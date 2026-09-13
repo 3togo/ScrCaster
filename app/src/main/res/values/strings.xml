@@ -87,6 +87,17 @@
     <string name="device_section_logs">Logs</string>
     <string name="device_pairing_title">Pair device using pairing code</string>
     <string name="device_pairing_desc">Use a six-digit pairing code to pair a new device</string>
+    <string name="device_pairing_qr_title">Pair device using QR code</string>
+    <string name="device_pairing_qr_hint">On the phone, open\nDeveloper options - Wireless debugging - Pair device with QR code\nScan this code and stay on that screen until pairing finishes</string>
+    <string name="device_pairing_qr_waiting">Waiting for the phone to scan the code…</string>
+    <string name="device_pairing_qr_pairing">Device found (%1$s), pairing…</string>
+    <string name="device_pairing_qr_connecting">Paired with %1$s, connecting…</string>
+    <string name="device_pairing_qr_connected">Paired and connected</string>
+    <string name="device_pairing_qr_failed">Pairing failed: %1$s. Scan the code again on the phone to retry.</string>
+    <string name="device_pairing_qr_failed_unknown">Pairing failed. Scan the code again on the phone to retry.</string>
+    <string name="device_pairing_qr_connect_failed">Paired, but connecting to %1$s failed. Scan the code again on the phone to retry.</string>
+    <string name="device_pairing_qr_timeout">Timed out waiting for the phone. Close and reopen this dialog for a new code.</string>
+    <string name="cd_show_qr_pairing">Show pairing QR code</string>
     <string name="device_quick_connect_title">Connect / Add device</string>
     <string name="device_status_mirroring">Mirroring</string>
     <string name="device_status_resolution">Resolution</string>

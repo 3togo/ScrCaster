@@ -209,6 +209,7 @@ internal fun DeviceTabPage(
     val pendingScrollToPreview by viewModel.pendingScrollToPreview.collectAsState()
     val savedShortcuts by viewModel.savedShortcuts.collectAsState()
     val quickConnectInputTemp by viewModel.quickConnectInput.collectAsState()
+    val qrPairingState by viewModel.qrPairingState.collectAsState()
 
     val adbConnected by viewModel.adbConnected.collectAsState()
     val statusLine by viewModel.statusLine.collectAsState()
@@ -565,6 +566,9 @@ internal fun DeviceTabPage(
             },
             onCancelConnect = {
                 viewModel.cancelAdbConnect()
+            },
+            onShowQrPairing = {
+                viewModel.startQrPairing()
             },
         )
     }
@@ -1030,5 +1034,10 @@ internal fun DeviceTabPage(
         refreshBusy = listingsRefreshBusy,
         onDismissRequest = { viewModel.hideAllApps() },
         onRefresh = { scope.launch(Dispatchers.IO) { viewModel.refreshApps() } },
+    )
+
+    QrPairingDialog(
+        state = qrPairingState,
+        onDismiss = { viewModel.cancelQrPairing() },
     )
 }

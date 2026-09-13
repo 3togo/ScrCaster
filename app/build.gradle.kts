@@ -59,8 +59,8 @@ android {
         applicationId = "io.github.miuzarte.scrcpyforandroid"
         minSdk = 26
         targetSdk = 37
-        versionCode = 44
-        versionName = "0.6.1"
+        versionCode = 45
+        versionName = "0.6.2"
 
         externalNativeBuild {
             cmake {
@@ -175,6 +175,7 @@ dependencies {
     implementation("com.github.promeg:tinypinyin:3.0.0")
 
     testImplementation(libs.junit)
+    testImplementation(libs.zxing.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

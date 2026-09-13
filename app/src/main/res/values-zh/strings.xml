@@ -87,6 +87,17 @@
     <string name="device_section_logs">日志</string>
     <string name="device_pairing_title">使用配对码配对设备</string>
     <string name="device_pairing_desc">使用六位数的配对码配对新设备</string>
+    <string name="device_pairing_qr_title">使用二维码配对设备</string>
+    <string name="device_pairing_qr_hint">在手机上进入\n开发者选项 - 无线调试 - 使用二维码配对设备\n扫描此二维码并配对完成前请停留在该页面</string>
+    <string name="device_pairing_qr_waiting">等待手机扫描二维码…</string>
+    <string name="device_pairing_qr_pairing">已发现设备（%1$s），正在配对…</string>
+    <string name="device_pairing_qr_connecting">已与 %1$s 配对，正在连接…</string>
+    <string name="device_pairing_qr_connected">配对并连接成功</string>
+    <string name="device_pairing_qr_failed">配对失败：%1$s。请在手机上重新扫码重试。</string>
+    <string name="device_pairing_qr_failed_unknown">配对失败。请在手机上重新扫码重试。</string>
+    <string name="device_pairing_qr_connect_failed">已配对，但连接 %1$s 失败。请在手机上重新扫码重试。</string>
+    <string name="device_pairing_qr_timeout">等待手机超时。关闭后重新打开本对话框会生成新的二维码。</string>
+    <string name="cd_show_qr_pairing">显示配对二维码</string>
     <string name="device_quick_connect_title">连接 / 添加设备</string>
     <string name="device_status_mirroring">投屏中</string>
     <string name="device_status_resolution">分辨率</string>

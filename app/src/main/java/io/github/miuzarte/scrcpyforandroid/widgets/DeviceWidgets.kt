@@ -1456,6 +1456,7 @@ internal fun QuickConnectCard(
     onConnect: () -> Unit,
     onCancelConnect: () -> Unit,
     onAddDevice: () -> Unit,
+    onShowQrPairing: (() -> Unit)? = null,
     connecting: Boolean = false,
     enabled: Boolean = true,
 ) {
@@ -1497,6 +1498,25 @@ internal fun QuickConnectCard(
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 onFocusLost = onFocusLost,
+                trailingIcon = onShowQrPairing?.let { onShowQr ->
+                    {
+                        Row(modifier = Modifier.padding(end = UiSpacing.Medium)) {
+                            IconButton(
+                                onClick = {
+                                    haptic.contextClick()
+                                    focusManager.clearFocus()
+                                    onShowQr()
+                                },
+                                enabled = enabled,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.QrCode2,
+                                    contentDescription = stringResource(R.string.cd_show_qr_pairing),
+                                )
+                            }
+                        }
+                    }
+                },
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),

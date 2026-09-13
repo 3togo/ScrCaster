@@ -4,6 +4,7 @@ import android.hardware.usb.UsbDevice
 import android.os.Parcelable
 import io.github.miuzarte.scrcpyforandroid.models.ConnectionTarget
 import io.github.miuzarte.scrcpyforandroid.models.DeviceConnectionType
+import io.github.miuzarte.scrcpyforandroid.nativecore.AdbPairingResult
 import io.github.miuzarte.scrcpyforandroid.nativecore.NativeAdbService
 import io.github.miuzarte.scrcpyforandroid.storage.ScrcpyOptions
 import kotlinx.coroutines.Dispatchers
@@ -165,11 +166,13 @@ internal class DeviceAdbConnectionCoordinator(
     suspend fun discoverPairingService(
         timeoutMs: Long = 12_000,
         includeLanDevices: Boolean = true,
+        matchInstanceName: String? = null,
     ): Pair<String, Int>? {
         return withContext(Dispatchers.IO) {
             adbService.discoverPairingService(
                 timeoutMs = timeoutMs,
                 includeLanDevices = includeLanDevices,
+                matchInstanceName = matchInstanceName,
             )
         }
     }
@@ -177,16 +180,20 @@ internal class DeviceAdbConnectionCoordinator(
     suspend fun discoverConnectService(
         timeoutMs: Long = 12_000,
         includeLanDevices: Boolean = true,
+        matchInstanceName: String? = null,
+        matchHostAddress: String? = null,
     ): Pair<String, Int>? {
         return withContext(Dispatchers.IO) {
             adbService.discoverConnectService(
                 timeoutMs = timeoutMs,
                 includeLanDevices = includeLanDevices,
+                matchInstanceName = matchInstanceName,
+                matchHostAddress = matchHostAddress,
             )
         }
     }
 
-    suspend fun pair(host: String, port: Int, pairingCode: String): Boolean {
+    suspend fun pair(host: String, port: Int, pairingCode: String): AdbPairingResult {
         return withContext(Dispatchers.IO) {
             val resolved = resolveHost(host)
             adbService.pair(resolved, port, pairingCode)
