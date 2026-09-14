@@ -29,7 +29,6 @@ import java.io.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.ArrayDeque
-import java.util.Locale
 import kotlin.concurrent.thread
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -125,22 +124,6 @@ class Scrcpy(
         const val DEFAULT_SERVER_ASSET_NAME = "scrcpy-server-v4.1"
         const val DEFAULT_SERVER_VERSION = "4.1"
         const val DEFAULT_REMOTE_PATH = "/data/local/tmp/scrcpy-server.jar"
-
-        // Regex patterns for parsing server output
-        private val VIDEO_ENCODER_INFO_REGEX =
-            Regex("""--video-codec=(\S+)\s+--video-encoder=(\S+)\s+\((hw|sw)\)(\s+\[vendor])?(?:\s+\(alias for (\S+)\))?""")
-        private val AUDIO_ENCODER_INFO_REGEX =
-            Regex("""--audio-codec=(\S+)\s+--audio-encoder=(\S+)\s+\((hw|sw)\)(\s+\[vendor])?(?:\s+\(alias for (\S+)\))?""")
-        private val DISPLAY_REGEX =
-            Regex("""--display-id=(\d+)\s+\((\d+)x(\d+)\)""")
-        private val CAMERA_SIZE_REGEX =
-            Regex("""\b([1-9][0-9]{1,4}x[1-9][0-9]{1,4})\b""")
-        private val CAMERA_INFO_REGEX =
-            Regex("""--camera-id=(\S+)\s+\(([^,]+),\s*([0-9]+x[0-9]+),\s*fps=\[([0-9,\s]+)\]\)""")
-        private val APP_REGEX =
-            Regex("""^\s*([*-])\s+(.+?)\s{2,}([A-Za-z0-9._]+)\s*$""", RegexOption.MULTILINE)
-        private val RECENT_TASK_PACKAGE_REGEX =
-            Regex("""\bcmp=([A-Za-z0-9._]+)/""")
 
         fun generateScid(): UInt {
             // Only use 31 bits to avoid issues with signed values on the Java-side
@@ -640,7 +623,7 @@ class Scrcpy(
 
                 runTrackedFetch {
                     val output = executeList(ListOptions.ENCODERS)
-                    val (video, audio) = parseEncoders(output)
+                    val (video, audio) = ScrcpyOutputParser.parseEncoders(output)
                     cachedVideoEncoders = video
                     cachedAudioEncoders = audio
                     logListPreview(
@@ -659,7 +642,7 @@ class Scrcpy(
                 cachedDisplays?.takeUnless { forceRefresh } ?: run {
                     runTrackedFetch {
                         val output = executeList(ListOptions.DISPLAYS)
-                        val parsed = parseDisplays(output)
+                        val parsed = ScrcpyOutputParser.parseDisplays(output)
                         cachedDisplays = parsed
                         logListPreview(
                             list = ListOptions.DISPLAYS,
@@ -678,7 +661,7 @@ class Scrcpy(
                 cachedCameras?.takeUnless { forceRefresh } ?: run {
                     runTrackedFetch {
                         val output = executeList(ListOptions.CAMERAS)
-                        val parsed = parseCameras(output)
+                        val parsed = ScrcpyOutputParser.parseCameras(output)
                         cachedCameras = parsed
                         logListPreview(
                             list = ListOptions.CAMERAS,
@@ -697,7 +680,7 @@ class Scrcpy(
                 cachedCameraSizes?.takeUnless { forceRefresh } ?: run {
                     runTrackedFetch {
                         val output = executeList(ListOptions.CAMERA_SIZES)
-                        val parsed = parseCameraSizes(output)
+                        val parsed = ScrcpyOutputParser.parseCameraSizes(output)
                             .sortedWith(
                                 compareByDescending { size ->
                                     size.substringBefore('x').toIntOrNull() ?: 0
@@ -721,7 +704,7 @@ class Scrcpy(
                 cachedApps?.takeUnless { forceRefresh } ?: run {
                     runTrackedFetch {
                         val output = executeList(ListOptions.APPS)
-                        val parsed = parseApps(output)
+                        val parsed = ScrcpyOutputParser.parseApps(output)
                         cachedApps = parsed
                         cachedAppsByPackage = parsed.associateBy { it.packageName }
                         cachedRecentTasks = cachedRecentTasks?.map { task ->
@@ -744,7 +727,7 @@ class Scrcpy(
                 cachedRecentTasks?.takeUnless { forceRefresh } ?: run {
                     runTrackedFetch {
                         val output = NativeAdbService.shell("dumpsys activity recents")
-                        val parsed = parseRecentTasks(output).map { task ->
+                        val parsed = ScrcpyOutputParser.parseRecentTasks(output).map { task ->
                             task.copy(appLabel = cachedAppsByPackage[task.packageName]?.label)
                         }
                         cachedRecentTasks = parsed
@@ -806,193 +789,6 @@ class Scrcpy(
         val preview = output.lineSequence().take(32).joinToString("\n")
         Log.i(TAG, "listOptions($list): parsed $countSummary, outputPreview=\n$preview")
     }
-
-    private fun parseEncoders(output: String): Pair<List<EncoderInfo>, List<EncoderInfo>> {
-        val videoInfos = linkedMapOf<String, EncoderInfo>()
-        val audioInfos = linkedMapOf<String, EncoderInfo>()
-
-        VIDEO_ENCODER_INFO_REGEX.findAll(output).forEach { match ->
-            val info = EncoderInfo(
-                codec = Codec.fromString(match.groupValues[1], Codec.Type.VIDEO),
-                id = match.groupValues[2],
-                type = if (match.groupValues[3] == EncoderType.HARDWARE.s) {
-                    EncoderType.HARDWARE
-                } else {
-                    EncoderType.SOFTWARE
-                },
-                isVendor = match.groupValues[4].isNotBlank(),
-                aliasOf = match.groupValues[5].ifBlank { null },
-            )
-            videoInfos.putIfAbsent(info.id, info)
-        }
-
-        AUDIO_ENCODER_INFO_REGEX.findAll(output).forEach { match ->
-            val info = EncoderInfo(
-                codec = Codec.fromString(match.groupValues[1], Codec.Type.AUDIO),
-                id = match.groupValues[2],
-                type = if (match.groupValues[3] == EncoderType.HARDWARE.s) {
-                    EncoderType.HARDWARE
-                } else {
-                    EncoderType.SOFTWARE
-                },
-                isVendor = match.groupValues[4].isNotBlank(),
-                aliasOf = match.groupValues[5].ifBlank { null },
-            )
-            audioInfos.putIfAbsent(info.id, info)
-        }
-
-        return videoInfos.values.toList() to audioInfos.values.toList()
-    }
-
-    private fun parseDisplays(output: String): List<DisplayInfo> {
-        val displays = LinkedHashSet<DisplayInfo>()
-        DISPLAY_REGEX.findAll(output).forEach { match ->
-            displays.add(
-                DisplayInfo(
-                    id = match.groupValues[1].toInt(),
-                    width = match.groupValues[2].toInt(),
-                    height = match.groupValues[3].toInt(),
-                ),
-            )
-        }
-        return displays.toList()
-    }
-
-    private fun parseCameras(output: String): List<CameraInfo> {
-        val cameras = LinkedHashSet<CameraInfo>()
-        CAMERA_INFO_REGEX.findAll(output).forEach { match ->
-            val facing = match.groupValues[2]
-            val activeSize = match.groupValues[3]
-            val fpsValues = match.groupValues[4]
-                .split(',')
-                .mapNotNull { it.trim().toIntOrNull() }
-
-            cameras.add(
-                CameraInfo(
-                    id = match.groupValues[1],
-                    facing = CameraFacing.fromString(facing),
-                    activeSize = activeSize,
-                    fps = fpsValues.map(Int::toUShort),
-                ),
-            )
-        }
-        return cameras.toList()
-    }
-
-    private fun parseCameraSizes(output: String): List<String> {
-        val sizes = LinkedHashSet<String>()
-        CAMERA_SIZE_REGEX.findAll(output).forEach { match ->
-            sizes.add(match.groupValues[1])
-        }
-        return sizes.toList()
-    }
-
-    private fun parseApps(output: String): List<AppInfo> {
-        val apps = LinkedHashSet<AppInfo>()
-        APP_REGEX.findAll(output).forEach { match ->
-            apps.add(
-                AppInfo(
-                    system = match.groupValues[1] == "*",
-                    label = match.groupValues[2].trim(),
-                    packageName = match.groupValues[3].trim(),
-                ),
-            )
-        }
-        return apps.toList().sortedBy { appSortKey(it) }
-    }
-
-    private fun appSortKey(app: AppInfo): String {
-        val label = app.label?.takeIf { it.isNotBlank() } ?: app.packageName
-        val tokens = label.map { char ->
-            when {
-                char.code <= 0x7F -> AppSortToken(
-                    priority = 0,
-                    value = char.lowercaseChar().toString(),
-                )
-
-                Pinyin.isChinese(char) -> AppSortToken(
-                    priority = 1,
-                    value = Pinyin.toPinyin(char).lowercase(Locale.ROOT),
-                )
-
-                else -> AppSortToken(
-                    priority = 2,
-                    value = char.lowercaseChar().toString(),
-                )
-            }
-        }
-        val firstToken = tokens.firstOrNull { it.value.any(Char::isLetterOrDigit) }
-            ?: tokens.firstOrNull()
-        val firstLetter = firstToken
-            ?.value
-            ?.firstOrNull(Char::isLetterOrDigit)
-            ?: Char.MAX_VALUE
-
-        return buildString {
-            append(firstLetter)
-            append('\u0000')
-            append(firstToken?.priority ?: 2)
-            append('\u0000')
-            tokens.forEach { token ->
-                append(token.value)
-                append('\u0000')
-            }
-            append('\u0001')
-            append(app.packageName.lowercase(Locale.ROOT))
-        }
-    }
-
-    private data class AppSortToken(
-        val priority: Int,
-        val value: String,
-    )
-
-    private fun parseRecentTasks(output: String): List<RecentTaskInfo> {
-        val packages = LinkedHashSet<String>()
-        RECENT_TASK_PACKAGE_REGEX.findAll(output).forEach { match ->
-            val packageName = match.groupValues[1].trim()
-            if (packageName.isNotBlank()) {
-                packages += packageName
-            }
-        }
-        return packages.map { packageName ->
-            RecentTaskInfo(
-                packageName = packageName,
-            )
-        }
-    }
-
-    data class EncoderInfo(
-        val codec: Codec,
-        val id: String,
-        val type: EncoderType,
-        val isVendor: Boolean,
-        val aliasOf: String? = null,
-    )
-
-    data class CameraInfo(
-        val id: String,
-        val facing: CameraFacing,
-        val activeSize: String,
-        val fps: List<UShort>,
-    )
-
-    data class DisplayInfo(
-        val id: Int,
-        val width: Int,
-        val height: Int,
-    )
-
-    data class AppInfo(
-        val system: Boolean?,
-        val label: String?,
-        val packageName: String,
-    )
-
-    data class RecentTaskInfo(
-        val packageName: String,
-        val appLabel: String? = null,
-    )
 
     private suspend fun executeServer(
         serverJar: File,

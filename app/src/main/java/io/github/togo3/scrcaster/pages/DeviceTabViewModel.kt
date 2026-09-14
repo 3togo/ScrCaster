@@ -26,6 +26,7 @@ import io.github.togo3.scrcaster.nativecore.AdbMdnsDiscoverer
 import io.github.togo3.scrcaster.nativecore.UsbAdbSession
 import io.github.togo3.scrcaster.nativecore.UsbDeviceInfo
 import io.github.togo3.scrcaster.nativecore.pairQrSecret
+import io.github.togo3.scrcaster.scrcpy.AppInfo
 import io.github.togo3.scrcaster.scrcpy.Scrcpy
 import io.github.togo3.scrcaster.scan.ScannedQr
 import io.github.togo3.scrcaster.scan.classifyScannedQr
@@ -1425,7 +1426,7 @@ internal class DeviceTabViewModel(
         scrcpy.pressBackOrTurnScreenOn(action)
     }
 
-    fun findCachedApp(packageName: String): Scrcpy.AppInfo? =
+    fun findCachedApp(packageName: String): AppInfo? =
         scrcpy.listings.findCachedApp(packageName)
 
     suspend fun startApp(packageName: String) {
