@@ -641,4 +641,15 @@
     <string name="tv_remote_accessibility_label">ScrCaster 遥控器按键处理</string>
     <string name="tv_remote_accessibility_description">让电视遥控器返回键打开 ScrCaster 播放控制。不会读取屏幕内容。</string>
 
+    <string name="pref_update_prerelease_latest">，当前为最新的预发布版本</string>
+    <string name="scrcpyopt_fullscreen_fill">全屏填充</string>
+    <string name="scrcpyopt_fullscreen_fill_summary">视频适配屏幕的方式：适应（留黑边）、拉伸或裁剪填充</string>
+    <string name="scrcpyopt_aspect_ratio">宽高比</string>
+    <string name="scrcpyopt_aspect_ratio_summary">将投屏视频裁剪为固定的显示比例</string>
+    <string name="scrcpyopt_aspect_ratio_custom">自定义比例（宽:高或小数）</string>
+    <string name="scrcpyopt_render_fit_fit">适应（留黑边）</string>
+    <string name="scrcpyopt_render_fit_stretch">拉伸</string>
+    <string name="scrcpyopt_render_fit_crop">裁剪填充短边</string>
+    <string name="scrcpyopt_render_fit_long_edge">裁剪填充长边</string>
+
 </resources>
