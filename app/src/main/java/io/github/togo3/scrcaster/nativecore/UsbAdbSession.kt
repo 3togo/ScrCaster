@@ -1,5 +1,6 @@
 package io.github.togo3.scrcaster.nativecore
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.hardware.usb.UsbDevice
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,8 @@ import java.io.OutputStream
  * 调用方无需关心自身调度器, 直接在主协程调 openTunnel/disconnect 也安全
  */
 object UsbAdbSession {
+    // 隧道始终以 applicationContext 构造 (见 openTunnel), 进程级持有不会泄漏 Activity。
+    @SuppressLint("StaticFieldLeak")
     private var tunnel: UsbAdbTunnel? = null
 
     /**
@@ -34,7 +37,8 @@ object UsbAdbSession {
             runCatching { tunnel?.close() }
             tunnel = null
 
-            val newTunnel = UsbAdbTunnel(context, usbDevice)
+            // 隧道由进程级单例持有, 一律用 applicationContext 构造, 避免静态字段泄漏 Activity。
+            val newTunnel = UsbAdbTunnel(context.applicationContext, usbDevice)
             val streams = try {
                 newTunnel.open()
             } catch (e: Exception) {

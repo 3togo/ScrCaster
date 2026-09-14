@@ -1,6 +1,7 @@
 package io.github.togo3.scrcaster
 
 import android.R.drawable
+import android.annotation.SuppressLint
 import android.app.PictureInPictureUiState
 import android.app.RemoteAction
 import android.content.Context
@@ -206,6 +207,9 @@ class StreamActivity: FragmentActivity() {
         super.onPause()
     }
 
+    // 拦截 TV 遥控器按键必须重写 dispatchKeyEvent 并对未处理键回落 super;
+    // androidx 将该 override 标记为 RestrictedApi, 此处为必要用法故抑制。
+    @SuppressLint("RestrictedApi")
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (!tvReceiverMode) return super.dispatchKeyEvent(event)
         val code = event.keyCode

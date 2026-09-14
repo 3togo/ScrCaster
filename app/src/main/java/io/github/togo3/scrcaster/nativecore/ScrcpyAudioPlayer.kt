@@ -2,6 +2,7 @@ package io.github.togo3.scrcaster.nativecore
 
 // Go reader note: Audio output helper for scrcpy stream: decodes/plays PCM or codec audio frames.
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.media.*
 import android.os.Build
@@ -181,6 +182,8 @@ class ScrcpyAudioPlayer(
         return audioTrack
     }
 
+    // AUDIO_SESSION_ID_GENERATE == 0 是文档允许的"分配新会话"哨兵值, lint Range 误报。
+    @SuppressLint("Range")
     private fun buildAudioTrack(): AudioTrack {
         val minBuf = AudioTrack.getMinBufferSize(
             SAMPLE_RATE, AudioFormat.CHANNEL_OUT_STEREO, AudioFormat.ENCODING_PCM_16BIT,

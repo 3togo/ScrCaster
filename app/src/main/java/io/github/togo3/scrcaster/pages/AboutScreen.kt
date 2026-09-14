@@ -45,7 +45,7 @@ import top.yukonga.miuix.kmp.preference.ArrowPreference
 import top.yukonga.miuix.kmp.shader.isRenderEffectSupported
 import top.yukonga.miuix.kmp.theme.MiuixTheme.colorScheme
 import top.yukonga.miuix.kmp.theme.MiuixTheme.textStyles
-import java.util.Locale.getDefault
+import java.util.Locale
 
 @Composable
 internal fun AboutScreen() {
@@ -276,7 +276,7 @@ private fun AboutContent(
             }
             Text(
                 text = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})" +
-                        " · ${BuildConfig.BUILD_TYPE.uppercase(getDefault())} BUILD",
+                        " · ${BuildConfig.BUILD_TYPE.uppercase(Locale.ROOT)} BUILD",
                 modifier = Modifier
                     .fillMaxWidth()
                     .graphicsLayer {

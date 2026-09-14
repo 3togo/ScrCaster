@@ -259,11 +259,9 @@ class UsbAdbDeviceWatcher(
         val intent = Intent(ACTION_USB_PERMISSION).apply {
             component = ComponentName(context.packageName, UsbPermissionReceiver::class.java.name)
         }
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
-        } else {
-            PendingIntent.FLAG_UPDATE_CURRENT
-        }
+        // FLAG_MUTABLE 常量位在 API 31 以下会被系统忽略, 可无条件 OR 上; minSdk 26
+        // 已高于 M, 无需再做版本分支 (也满足 Android 14+ 对可变 PendingIntent 的要求)。
+        val flags = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
         val permissionIntent = PendingIntent.getBroadcast(
             context, 0, intent, flags
         )

@@ -201,11 +201,10 @@ class UsbAdbTunnel(
         }
         
         val filter = IntentFilter(ACTION_USB_PERMISSION)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(permissionReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            context.registerReceiver(permissionReceiver, filter)
-        }
+        // RECEIVER_NOT_EXPORTED 常量自 API 26 起可用 (= minSdk); 该权限广播仅经
+        // requestPermission 的 PendingIntent 发回本应用, 始终用 NOT_EXPORTED 即可,
+        // 同时满足 Android 14+ 对动态注册接收器必须显式声明导出标志的要求。
+        context.registerReceiver(permissionReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
     }
 
     /**
@@ -232,11 +231,8 @@ class UsbAdbTunnel(
         }
         
         val filter = IntentFilter(UsbManager.ACTION_USB_DEVICE_DETACHED)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(detachedReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
-        } else {
-            context.registerReceiver(detachedReceiver, filter)
-        }
+        // 受保护的系统广播, 系统可投递给非导出接收器; 标志自 API 26 起可用, 直接固定传参。
+        context.registerReceiver(detachedReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
     }
 
     /**
