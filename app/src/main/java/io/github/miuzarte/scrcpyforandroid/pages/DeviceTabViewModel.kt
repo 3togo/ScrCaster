@@ -540,15 +540,11 @@ internal class DeviceTabViewModel(
         cause: DisconnectCause = DisconnectCause.User,
         statusLine: String = "Disconnected",
     ) {
-        val result = connectionController.disconnectAdbConnection(
+        connectionController.disconnectAdbConnection(
             clearQuickOnlineForTarget,
             cause,
             statusLine,
         )
-        result.clearedTarget?.let { target ->
-            if (target.host.isNotBlank())
-                _savedShortcuts.update { it.update(host = target.host, port = target.port) }
-        }
         logMessage?.let { logEvent(it) }
     }
 
@@ -556,8 +552,6 @@ internal class DeviceTabViewModel(
         val disconnected = connectionController.disconnectCurrentTargetBeforeConnecting(newHost, newPort)
             ?: return
         sessionReconnectBlacklistHosts += disconnected.host
-        if (disconnected.host.isNotBlank())
-            _savedShortcuts.update { it.update(host = disconnected.host, port = disconnected.port) }
     }
 
     suspend fun connectWithTimeout(host: String, port: Int) {
@@ -730,12 +724,11 @@ internal class DeviceTabViewModel(
 
         applyConnectedDeviceCapabilities(info.sdkInt)
 
-        // USB 的 host 是 VID/PID; 快捷方式地址本身带 usb: 前缀 (解析后 host 即 VID/PID),
-        // 这里必须用原始 host 查找才能命中并更新名称
+        // 端口是临时的: 按 host 定位条目, 否则端口不一致时 (如 mDNS 换了端口) 名字会静默写不进去
+        // USB 的 host 是 VID/PID; 快捷方式地址本身带 usb: 前缀 (解析后 host 即 VID/PID), 同样按 host 命中
         _savedShortcuts.update {
-            it.update(
+            it.updateNameByHost(
                 host = host,
-                port = port,
                 name = fullLabel,
                 updateNameOnlyWhenEmpty = true,
             )
@@ -840,11 +833,7 @@ internal class DeviceTabViewModel(
 
         if (options.killAdbOnClose) {
             currentTarget.value?.host?.let { sessionReconnectBlacklistHosts += it }
-            val result = connectionController.stopScrcpySession(killAdbOnClose = true)
-            result.clearedTarget?.let { target ->
-                if (target.host.isNotBlank())
-                    _savedShortcuts.update { it.update(host = target.host, port = target.port) }
-            }
+            connectionController.stopScrcpySession(killAdbOnClose = true)
             logEvent(R.string.vm_scrcpy_stopped_adb_disconnected_log)
             AppRuntime.snackbar(R.string.vm_scrcpy_stopped_adb_disconnected)
         } else {
@@ -1258,13 +1247,7 @@ internal class DeviceTabViewModel(
                     )
                 },
                 onMdnsPortChanged = { host, oldPort, newPort ->
-                    _savedShortcuts.update {
-                        it.update(
-                            host = host,
-                            port = oldPort,
-                            newPort = newPort,
-                        )
-                    }
+                    _savedShortcuts.update { it.upsertByHost(host, newPort) }
                     logEvent(R.string.vm_mdns_updated, host, oldPort, newPort)
                 },
                 onKnownDeviceReconnected = { target ->
@@ -1272,7 +1255,8 @@ internal class DeviceTabViewModel(
                     logEvent(R.string.vm_quick_probe_success, target.host, target.port)
                 },
                 onDiscoveredDeviceReconnected = { host, port, _ ->
-                    _savedShortcuts.update { it.update(host = host, port = port) }
+                    // 列表里存的是旧端口, 按 host 覆盖端口
+                    _savedShortcuts.update { it.upsertByHost(host, port) }
                     logEvent(R.string.vm_quick_probe_success, host, port)
                 },
                 retryIntervalMs = ADB_AUTO_RECONNECT_RETRY_INTERVAL_MS,
