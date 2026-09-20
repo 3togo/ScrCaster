@@ -106,7 +106,7 @@ submodule if needed. Install Java first (JDK 21 is recommended); a fresh Linux
 x86_64 setup also needs `curl`, `unzip`, `sha256sum` and `git`.
 
 ```sh
-./build.sh                                      # Build with the existing SDK
+./build.sh                                      # Build with the existing SDK (runs lintDebug after build)
 ./build.sh --setup-sdk                          # Prepare SDK; review licenses
 ./build.sh --setup-sdk --accept-licenses         # Prepare SDK; accept licenses
 ./build.sh clean assembleDebug -PabiList=arm64-v8a
@@ -153,8 +153,10 @@ non-interactive install, set `ANDROID_SERIAL` to select one device.
 
 ## Features
 
+- USB 和无线 ADB 连接
 - 控制时可拉起本机输入法，且支持输入中文
 - 剪贴板同步
+- 游戏手柄支持 (通过 UHID 虚拟手柄，Xbox 360 风格映射)
 - 低延迟音频链路 (默认未启用)
   - 受控设备播放 `USAGE_MEDIA` 流时 ([namidaco/namida](https://github.com/namidaco/namida)) ，两设备的音频延迟只差半拍 (没有具体测量能力)
   - 受控设备播放 `USAGE_GAME` 流时 (明日方舟 Bilibili 服) ，仍存在 100~200ms 的有感延迟
@@ -162,7 +164,7 @@ non-interactive install, set `ANDROID_SERIAL` to select one device.
 - 多配置切换，设备绑定配置，连接后直接进入全屏
 - 可替换 scrcpy-server
 - 利用 mDNS 服务实现自动连接启用无线调试的设备、自动发现等待配对设备的IP与端口
-- 二维码配对
+- 二维码配对 (扫码配对和生成二维码等待扫描)
 - 自动横竖屏切换
 - 横屏布局
   - 仅屏幕比例小于 16:9 的设备
@@ -171,6 +173,7 @@ non-interactive install, set `ANDROID_SERIAL` to select one device.
 - 双向文件传输
 - 流式 adb 终端
 - 内置录制
+- Android TV 接收端模式 (支持遥控器操控手机)
 
 ## 已知问题
 
