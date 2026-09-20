@@ -10,20 +10,24 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.kover)
+    alias(libs.plugins.ktlint)
     id("kotlin-parcelize")
 }
 
 val defaultAbiList = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-val configuredAbiList = (project.findProperty("abiList") as String?)
-    ?.split(",")
-    ?.map { it.trim() }
-    ?.filter { it.isNotEmpty() }
-    ?.ifEmpty { null }
-    ?: defaultAbiList
+val configuredAbiList =
+    (project.findProperty("abiList") as String?)
+        ?.split(",")
+        ?.map { it.trim() }
+        ?.filter { it.isNotEmpty() }
+        ?.ifEmpty { null }
+        ?: defaultAbiList
 val buildUniversalApk = configuredAbiList.size > 1
 val singleAbi = configuredAbiList.singleOrNull()
-val apkBuildTimestamp = LocalDateTime.now()
-    .format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
+val apkBuildTimestamp =
+    LocalDateTime
+        .now()
+        .format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
 
 android {
     namespace = "io.github.togo3.scrcaster"
@@ -33,17 +37,19 @@ android {
         create("release") {
             val envFile = rootProject.file(".env")
             val envProps = Properties()
-            if (envFile.exists())
+            if (envFile.exists()) {
                 envFile.inputStream().use { envProps.load(it) }
+            }
 
             fun getValue(key: String): String? {
-                var value = (
+                var value =
+                    (
                         envProps.getProperty(key)?.trim()?.takeIf { it.isNotEmpty() }
                             ?: System.getenv(key)?.trim()?.takeIf { it.isNotEmpty() }
-                        )
-                    ?.trim('"', '\'')
-                if (value != null && value.startsWith("~"))
+                    )?.trim('"', '\'')
+                if (value != null && value.startsWith("~")) {
                     value = System.getProperty("user.home") + value.substring(1)
+                }
                 return value
             }
 
@@ -108,7 +114,7 @@ android {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -124,12 +130,13 @@ android {
 
     packaging {
         resources {
-            excludes += listOf(
-                "META-INF/LICENSE.md",
-                "META-INF/LICENSE",
-                "META-INF/NOTICE.md",
-                "META-INF/NOTICE",
-            )
+            excludes +=
+                listOf(
+                    "META-INF/LICENSE.md",
+                    "META-INF/LICENSE",
+                    "META-INF/NOTICE.md",
+                    "META-INF/NOTICE",
+                )
         }
     }
 
@@ -145,22 +152,24 @@ android {
     lint {
         abortOnError = true
         warningsAsErrors = false
-        disable += listOf(
-            "ChromeOsAbiSupport",
-            "NewerVersionAvailable",
-            "TrustAllX509TrustManager",
-        )
+        disable +=
+            listOf(
+                "ChromeOsAbiSupport",
+                "NewerVersionAvailable",
+                "TrustAllX509TrustManager",
+            )
     }
-
 }
 
 kover {
     currentProject {
         instrumentation {
-            excludedClasses.addAll(listOf(
-                "com.termux.*",
-                "io.nayuki.*",
-            ))
+            excludedClasses.addAll(
+                listOf(
+                    "com.termux.*",
+                    "io.nayuki.*",
+                ),
+            )
         }
     }
     reports {
@@ -175,6 +184,14 @@ kover {
     }
 }
 
+ktlint {
+    version.set("1.5.0")
+    filter {
+        exclude { it.file.path.contains("com/termux/") }
+        exclude { it.file.path.contains("io/nayuki/") }
+    }
+}
+
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
@@ -184,16 +201,17 @@ kotlin {
 androidComponents {
     onVariants { variant ->
         variant.outputs.forEach { output ->
-            val abi = output.filters
-                .firstOrNull { it.filterType == FilterConfiguration.FilterType.ABI }
-                ?.identifier
-                ?: singleAbi
-                ?: "universal"
+            val abi =
+                output.filters
+                    .firstOrNull { it.filterType == FilterConfiguration.FilterType.ABI }
+                    ?.identifier
+                    ?: singleAbi
+                    ?: "universal"
 
             output.outputFileName.set(
                 output.versionName.map { versionName ->
                     "ScrCaster-v$versionName-$abi-${variant.name}-$apkBuildTimestamp.apk"
-                }
+                },
             )
         }
     }
@@ -253,68 +271,68 @@ val scrcpyServerAssetFile = "$scrcpyServerAssetDir/scrcpy-server-v4.1"
 val scrcpyServerDownloadUrl = "https://github.com/Genymobile/scrcpy/releases/download/v4.1/scrcpy-server-v4.1"
 val scrcpyServerSha256 = "deacb991ed2509715160ffdc7907e47b4160eb30d1566217e9047fd5b8850cae"
 
-val downloadScrcpyServer = tasks.register("downloadScrcpyServer") {
-    description = "Download scrcpy-server binary from GitHub releases if absent or SHA256 mismatch"
-    group = "build setup"
+val downloadScrcpyServer =
+    tasks.register("downloadScrcpyServer") {
+        description = "Download scrcpy-server binary from GitHub releases if absent or SHA256 mismatch"
+        group = "build setup"
 
-    inputs.property("downloadUrl", scrcpyServerDownloadUrl)
-    inputs.property("expectedSha256", scrcpyServerSha256)
-    outputs.file(scrcpyServerAssetFile)
+        inputs.property("downloadUrl", scrcpyServerDownloadUrl)
+        inputs.property("expectedSha256", scrcpyServerSha256)
+        outputs.file(scrcpyServerAssetFile)
 
-    doLast {
-        val file = outputs.files.singleFile
-        val url = inputs.properties["downloadUrl"] as String
-        val expectedSha = inputs.properties["expectedSha256"] as String
-        val dir = file.parentFile
+        doLast {
+            val file = outputs.files.singleFile
+            val url = inputs.properties["downloadUrl"] as String
+            val expectedSha = inputs.properties["expectedSha256"] as String
+            val dir = file.parentFile
 
-        if (!dir.exists()) dir.mkdirs()
+            if (!dir.exists()) dir.mkdirs()
 
-        fun computeSha256(f: File): String {
-            return f.inputStream().use { input ->
-                val digest = MessageDigest.getInstance("SHA-256")
-                val buffer = ByteArray(8192)
-                var count: Int
-                while (input.read(buffer).also { count = it } >= 0) {
-                    digest.update(buffer, 0, count)
-                }
-                digest.digest().joinToString("") { "%02x".format(it) }
-            }
-        }
-
-        val needsDownload = !file.exists() || computeSha256(file) != expectedSha
-
-        if (needsDownload) {
-            logger.lifecycle("Downloading scrcpy-server-v4.1 from GitHub releases...")
-            try {
-                URI(url).toURL().openStream().use { input ->
-                    file.outputStream().use { output ->
-                        input.copyTo(output)
+            fun computeSha256(f: File): String =
+                f.inputStream().use { input ->
+                    val digest = MessageDigest.getInstance("SHA-256")
+                    val buffer = ByteArray(8192)
+                    var count: Int
+                    while (input.read(buffer).also { count = it } >= 0) {
+                        digest.update(buffer, 0, count)
                     }
+                    digest.digest().joinToString("") { "%02x".format(it) }
                 }
-            } catch (e: Exception) {
-                throw GradleException(
-                    "Failed to download scrcpy-server-v4.1 from GitHub releases.\n" +
-                    "  URL: $url\n" +
-                    "  You may download it manually and place it at: ${file.absolutePath}\n" +
-                    "  If you are behind a proxy, check your Gradle proxy settings\n" +
-                    "  (gradle.properties: systemProp.https.proxyHost / systemProp.https.proxyPort).",
-                    e
-                )
-            }
 
-            val actualSha = computeSha256(file)
-            require(actualSha == expectedSha) {
-                "SHA256 mismatch for scrcpy-server-v4.1!\n" +
-                "  Expected: $expectedSha\n" +
-                "  Got:      $actualSha\n" +
-                "  Delete ${file.absolutePath} to retry download."
+            val needsDownload = !file.exists() || computeSha256(file) != expectedSha
+
+            if (needsDownload) {
+                logger.lifecycle("Downloading scrcpy-server-v4.1 from GitHub releases...")
+                try {
+                    URI(url).toURL().openStream().use { input ->
+                        file.outputStream().use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                } catch (e: Exception) {
+                    throw GradleException(
+                        "Failed to download scrcpy-server-v4.1 from GitHub releases.\n" +
+                            "  URL: $url\n" +
+                            "  You may download it manually and place it at: ${file.absolutePath}\n" +
+                            "  If you are behind a proxy, check your Gradle proxy settings\n" +
+                            "  (gradle.properties: systemProp.https.proxyHost / systemProp.https.proxyPort).",
+                        e,
+                    )
+                }
+
+                val actualSha = computeSha256(file)
+                require(actualSha == expectedSha) {
+                    "SHA256 mismatch for scrcpy-server-v4.1!\n" +
+                        "  Expected: $expectedSha\n" +
+                        "  Got:      $actualSha\n" +
+                        "  Delete ${file.absolutePath} to retry download."
+                }
+                logger.lifecycle("scrcpy-server-v4.1 downloaded and verified.")
+            } else {
+                logger.lifecycle("scrcpy-server-v4.1 exists with correct SHA256, skip download.")
             }
-            logger.lifecycle("scrcpy-server-v4.1 downloaded and verified.")
-        } else {
-            logger.lifecycle("scrcpy-server-v4.1 exists with correct SHA256, skip download.")
         }
     }
-}
 
 tasks.named("preBuild") {
     dependsOn(downloadScrcpyServer)
