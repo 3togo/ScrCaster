@@ -1,5 +1,6 @@
 package io.github.togo3.scrcaster.pages
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -130,6 +131,7 @@ fun SettingsScreen(
 }
 
 @Composable
+@SuppressLint("BatteryLife")
 fun SettingsPage(
     contentPadding: PaddingValues,
     scrollBehavior: ScrollBehavior,

@@ -101,6 +101,7 @@ internal class FocusChain(val keys: List<String>, val targets: Map<String, Focus
     }
     fun request(key: String) { (requesters[key] ?: requesters.getValue(keys.first())).requestFocus() }
     fun move(key: String, direction: Int) = request(order.move(key, direction))
+    @Suppress("ModifierFactoryExtensionFunction")
     fun modifier(key: String): Modifier = Modifier.testTag(key)
         .onGloballyPositioned { targets.getValue(key).placed.complete(Unit) }
         .focusRequester(requesters.getValue(key)).focusProperties {

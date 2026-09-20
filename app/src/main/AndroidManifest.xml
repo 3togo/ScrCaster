@@ -7,16 +7,20 @@
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <!-- 摄像头扫码为可选功能, 无摄像头设备仍可运行 -->
     <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.wifi" android:required="false" />
 
     <uses-sdk tools:overrideLibrary="top.yukonga.miuix.kmp.blur" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"
+        tools:ignore="LeanbackUsesWifi" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <!-- 摄像头扫码 (仅在设置中启用后请求) -->
-    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.CAMERA"
+        tools:ignore="PermissionImpliesUnsupportedHardware" />
 
     <!-- USB Host特性声明（可选，不强制要求） -->
     <uses-feature
@@ -64,7 +68,8 @@
             android:label="@string/tv_title"
             android:exported="true"
             android:screenOrientation="landscape"
-            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize">
+            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize"
+            tools:ignore="DiscouragedApi">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
@@ -100,7 +105,8 @@
             android:name=".LockscreenPasswordActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize"
             android:enableOnBackInvokedCallback="true"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="UnusedAttribute" />
 
         <service
             android:name=".TvRemoteAccessibilityService"

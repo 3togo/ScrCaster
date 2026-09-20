@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">ScrCaster</string>
 
     <!-- Main Tab Labels -->
@@ -630,7 +630,7 @@
     <string name="vm_clipboard_synced_paste">Synced local clipboard to device and triggered paste</string>
     <string name="vm_clipboard_paste_failed">Local clipboard paste failed</string>
     <string name="vm_session_disconnected">Scrcpy session disconnected</string>
-    <string name="vm_decoder_unsupported_size">Device decoder does not support %1$dx%2$d, downgrading to max_size=%3$d and restarting</string>
+    <string name="vm_decoder_unsupported_size" tools:ignore="PluralsCandidate">Device decoder does not support %1$dx%2$d, downgrading to max_size=%3$d and restarting</string>
     <string name="vm_decoder_init_failed">Decoder initialization failed: %1$s</string>
     <string name="vm_decoder_error_restarting">Decoder error, restarting session</string>
     <string name="vm_ime_text_failed">IME text submission failed: %1$s</string>

@@ -1,6 +1,7 @@
 package io.github.togo3.scrcaster
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -29,6 +30,7 @@ import kotlinx.coroutines.runBlocking
 import java.util.Locale
 
 // 生物认证需要 FragmentActivity
+@SuppressLint("AppBundleLocaleChanges")
 class MainActivity: FragmentActivity() {
 
     // 主界面方向策略的设置缓存, 仅在主线程读写; 默认值与存储层默认一致

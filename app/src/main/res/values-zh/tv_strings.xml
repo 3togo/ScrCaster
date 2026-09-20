@@ -1,21 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tv_title">ScrCaster</string>
-    <string name="tv_instructions">将两台设备连接到同一网络，并在手机上开启无线调试。播放时，按返回键或菜单键打开接收端控制；方向键和确认键可控制手机。</string>
-    <string name="tv_host">手机 IP 地址或主机名</string>
-    <string name="tv_port">ADB 连接端口</string>
-    <string name="tv_audio">在电视上播放手机声音</string>
-    <string name="tv_connect">连接 / 继续</string>
-    <string name="tv_pair">配对无线调试</string>
     <string name="tv_disconnect">断开连接</string>
     <string name="tv_disconnected">已断开连接</string>
-    <string name="tv_ready">就绪。用方向键选择控件，按确认键激活。</string>
-    <string name="tv_invalid_address">请输入手机地址以及 1 到 65535 之间的端口。</string>
     <string name="tv_connecting">正在连接…如手机上出现调试授权提示，请允许。</string>
     <string name="tv_connected">已连接。播放时按返回键可打开接收端菜单。</string>
-    <string name="tv_pair_port">配对端口</string>
     <string name="tv_pair_code">六位配对码</string>
-    <string name="tv_pair_instructions">在手机上打开「无线调试」→「使用配对码配对设备」，在此输入配对端口和配对码。这与上一屏的连接端口不同。</string>
     <string name="tv_invalid_pairing">请输入有效的配对端口和六位配对码。</string>
     <string name="tv_pairing">正在配对…</string>
     <string name="tv_pair_required">你的手机需要先与此电视配对。请在手机上打开「无线调试」→「使用配对码配对设备」。</string>

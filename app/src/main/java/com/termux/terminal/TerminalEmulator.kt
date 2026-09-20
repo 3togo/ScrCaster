@@ -1299,7 +1299,7 @@ class TerminalEmulator(
                 code in 90..97 -> mForeColor = code - 90 + 8
                 code in 100..107 -> mBackColor = code - 100 + 8
                 else -> {
-                    if (LOG_ESCAPE_SEQUENCES) Logger.logWarn(mClient, LOG_TAG, String.format("SGR unknown code %d", code))
+                    if (LOG_ESCAPE_SEQUENCES) Logger.logWarn(mClient, LOG_TAG, String.format(java.util.Locale.ROOT, "SGR unknown code %d", code))
                 }
             }
             i++

@@ -156,7 +156,7 @@ public final class QrCode {
 			if (version >= maxVersion) {  // All versions in the range could not fit the given data
 				String msg = "Segment too long";
 				if (dataUsedBits != -1)
-					msg = String.format("Data length = %d bits, Max capacity = %d bits", dataUsedBits, dataCapacityBits);
+					msg = String.format(java.util.Locale.ROOT, "Data length = %d bits, Max capacity = %d bits", dataUsedBits, dataCapacityBits);
 				throw new DataTooLongException(msg);
 			}
 		}

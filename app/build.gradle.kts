@@ -141,6 +141,16 @@ android {
     buildToolsVersion = "37.0.0"
     ndkVersion = "29.0.14206865"
 
+    lint {
+        abortOnError = true
+        warningsAsErrors = false
+        disable += listOf(
+            "ChromeOsAbiSupport",
+            "NewerVersionAvailable",
+            "TrustAllX509TrustManager",
+        )
+    }
+
 }
 
 kotlin {

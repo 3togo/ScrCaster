@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -177,7 +178,7 @@ private fun ConnectionDialogContent(state: ConnectionUiState, controller: Connec
         ConnectionDialog.PLAYBACK -> listOfNotNull("audio", "fill", "ratio", "custom".takeIf { custom }, "back")
         else -> emptyList()
     }
-    val maxDialogHeight = (LocalConfiguration.current.screenHeightDp * .9f).dp
+    val maxDialogHeight = (LocalWindowInfo.current.containerSize.height * .9f / LocalDensity.current.density).dp
     // Keep one Android window when changing methods; only replace its Compose content.
     Dialog(onDismissRequest = controller::dismissDialog, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         key(kind) {

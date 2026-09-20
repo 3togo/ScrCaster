@@ -576,6 +576,12 @@ log "Running Gradle: ${apk_tasks[*]}"
 # The upstream wrapper is not executable in every checkout.
 bash "$project_dir/gradlew" "${apk_tasks[@]}"
 
+# Run lint after a successful Android build (skip for desktop-only or custom tasks).
+if [[ " ${apk_tasks[*]} " == *"assembleDebug"* ]]; then
+    log "Running Android Lint (lintDebug)"
+    bash "$project_dir/gradlew" lintDebug || log "Warning: lintDebug reported issues (non-fatal)"
+fi
+
 if [[ -d "$project_dir/app/build/outputs/apk/debug" ]]; then
     log "Available debug APKs:"
     find "$project_dir/app/build/outputs/apk/debug" -maxdepth 1 -type f -name '*.apk' -print | sort

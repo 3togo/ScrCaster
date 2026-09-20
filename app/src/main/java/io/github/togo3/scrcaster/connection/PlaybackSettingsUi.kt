@@ -22,8 +22,8 @@ import io.github.togo3.scrcaster.scrcpy.ScrcpyAspectRatio
 internal fun PlaybackSettingsBody(
     options: PlaybackPreferences,
     setPlayback: (PlaybackPreferences) -> Unit,
-    focus: FocusChain? = null,
     modifier: Modifier = Modifier,
+    focus: FocusChain? = null,
 ) {
     val custom = options.aspectRatio == "CUSTOM"
     val keys = listOfNotNull("audio", "fill", "ratio", "custom".takeIf { custom }, "back")

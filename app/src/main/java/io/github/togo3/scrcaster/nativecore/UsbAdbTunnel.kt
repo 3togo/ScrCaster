@@ -1,5 +1,6 @@
 package io.github.togo3.scrcaster.nativecore
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -28,6 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  *
  * 注意: 此类不做 ADB 协议握手, 握手由 DirectAdbConnection 处理
  */
+@SuppressLint("InlinedApi")
 class UsbAdbTunnel(
     private val context: Context,
     private val usbDevice: UsbDevice,

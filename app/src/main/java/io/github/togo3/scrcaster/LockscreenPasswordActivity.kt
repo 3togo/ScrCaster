@@ -1,5 +1,6 @@
 package io.github.togo3.scrcaster
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -66,6 +67,7 @@ import top.yukonga.miuix.kmp.theme.MiuixTheme.colorScheme
 import top.yukonga.miuix.kmp.theme.MiuixTheme.textStyles
 import java.util.Locale
 
+@SuppressLint("AppBundleLocaleChanges")
 class LockscreenPasswordActivity: FragmentActivity() {
     override fun attachBaseContext(newBase: Context) {
         val languageTag = MainActivity.getAppLanguageTag(newBase)
