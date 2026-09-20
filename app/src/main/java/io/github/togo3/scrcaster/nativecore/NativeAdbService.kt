@@ -287,7 +287,11 @@ object NativeAdbService {
             }
         }
         val response = shell(script)
-        val outputs = ArrayList<String>(builder.commands.size)
+        return parseBatchOutput(response, markers)
+    }
+
+    internal fun parseBatchOutput(response: String, markers: List<String>): List<String> {
+        val outputs = ArrayList<String>(markers.size)
         var remaining = response
         markers.forEach { marker ->
             val token = "\n$marker\n"
