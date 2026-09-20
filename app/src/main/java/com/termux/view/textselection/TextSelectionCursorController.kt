@@ -3,7 +3,6 @@ package com.termux.view.textselection
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Rect
-import android.os.Build
 import android.text.TextUtils
 import android.view.ActionMode
 import android.view.Menu
@@ -145,11 +144,6 @@ class TextSelectionCursorController(private val terminalView: TerminalView) : Cu
             }
 
             override fun onDestroyActionMode(mode: ActionMode) {}
-        }
-
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            mActionMode = terminalView.startActionMode(callback)
-            return
         }
 
         mActionMode = terminalView.startActionMode(object : ActionMode.Callback2() {

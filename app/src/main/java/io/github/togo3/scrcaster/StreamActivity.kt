@@ -24,6 +24,7 @@ import android.content.pm.ActivityInfo
 import kotlinx.coroutines.channels.Channel
 import androidx.core.app.PictureInPictureParamsCompat.Builder
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -270,9 +271,10 @@ class StreamActivity: FragmentActivity() {
     }
 
     private fun savePhoneMappings() {
-        phoneMappingPreferences.edit().clear().apply {
+        phoneMappingPreferences.edit {
+            clear()
             phoneMappings.saved().forEach { (key, value) -> putString(key, value) }
-        }.apply()
+        }
     }
 
     private fun showPhoneMappings() {
@@ -345,8 +347,9 @@ class StreamActivity: FragmentActivity() {
             .setSingleChoiceItems(arrayOf(getString(R.string.tv_aspect_phone),
                 getString(R.string.tv_aspect_stream)), if (usePhoneAspect.value) 0 else 1) { dialog, index ->
                 usePhoneAspect.value = index == 0
-                getSharedPreferences("tv_connection", MODE_PRIVATE).edit()
-                    .putBoolean("phone_aspect", index == 0).apply()
+                getSharedPreferences("tv_connection", MODE_PRIVATE).edit {
+                    putBoolean("phone_aspect", index == 0)
+                }
                 dialog.dismiss()
             }.create()
         aspectDialog?.show()

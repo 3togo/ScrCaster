@@ -1,13 +1,11 @@
 package com.termux.view
 
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.app.Activity
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Typeface
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -31,8 +29,6 @@ import android.view.inputmethod.BaseInputConnection
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import android.widget.Scroller
-
-import androidx.annotation.RequiresApi
 
 import com.termux.terminal.KeyHandler
 import com.termux.terminal.TerminalEmulator
@@ -73,7 +69,7 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
     @JvmField
     var mScaleFactor: Float = 1f
 
-    internal lateinit var mGestureRecognizer: GestureAndScaleRecognizer
+    internal var mGestureRecognizer: GestureAndScaleRecognizer
 
     /** Keep track of where mouse touch event started which we report as mouse scroll. */
     private var mMouseScrollStartX: Int = -1
@@ -82,7 +78,7 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
     /** Keep track of the time when a touch event leading to sending mouse scroll events started. */
     private var mMouseStartDownTime: Long = -1
 
-    lateinit var mScroller: Scroller
+    var mScroller: Scroller
 
     /** What was left in from scrolling movement. */
     @JvmField
@@ -98,7 +94,6 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
      * The default is [AUTOFILL_TYPE_NONE] so that AutoFill UI, like toolbar above keyboard
      * is not shown automatically, like on Activity starts/View create.
      */
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private var mAutoFillType: Int = AUTOFILL_TYPE_NONE
 
     /**
@@ -106,7 +101,6 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
      *
      * The default is [IMPORTANT_FOR_AUTOFILL_NO] so that view is not considered important for AutoFill.
      */
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private var mAutoFillImportance: Int = IMPORTANT_FOR_AUTOFILL_NO
 
     /**
@@ -120,20 +114,20 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
         mGestureRecognizer = GestureAndScaleRecognizer(context, object : GestureAndScaleRecognizer.Listener {
             var scrolledWithFinger = false
 
-            override fun onUp(event: MotionEvent): Boolean {
+            override fun onUp(e: MotionEvent): Boolean {
                 mScrollRemainder = 0.0f
-                if (mEmulator != null && mEmulator!!.isMouseTrackingActive() && !event.isFromSource(InputDevice.SOURCE_MOUSE) && !isSelectingText && !scrolledWithFinger) {
+                if (mEmulator != null && mEmulator!!.isMouseTrackingActive() && !e.isFromSource(InputDevice.SOURCE_MOUSE) && !isSelectingText && !scrolledWithFinger) {
                     // Quick event processing when mouse tracking is active - do not wait for check of double tapping
                     // for zooming.
-                    sendMouseEventCode(event, TerminalEmulator.MOUSE_LEFT_BUTTON, true)
-                    sendMouseEventCode(event, TerminalEmulator.MOUSE_LEFT_BUTTON, false)
+                    sendMouseEventCode(e, TerminalEmulator.MOUSE_LEFT_BUTTON, true)
+                    sendMouseEventCode(e, TerminalEmulator.MOUSE_LEFT_BUTTON, false)
                     return true
                 }
                 scrolledWithFinger = false
                 return false
             }
 
-            override fun onSingleTapUp(event: MotionEvent): Boolean {
+            override fun onSingleTapUp(e: MotionEvent): Boolean {
                 if (mEmulator == null) return true
 
                 if (isSelectingText) {
@@ -141,21 +135,21 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
                     return true
                 }
                 requestFocus()
-                mClient?.onSingleTapUp(event)
+                mClient?.onSingleTapUp(e)
                 return true
             }
 
-            override fun onScroll(e: MotionEvent, distanceX: Float, distanceY: Float): Boolean {
+            override fun onScroll(e2: MotionEvent, dx: Float, dy: Float): Boolean {
                 if (mEmulator == null) return true
-                if (mEmulator!!.isMouseTrackingActive() && e.isFromSource(InputDevice.SOURCE_MOUSE)) {
+                if (mEmulator!!.isMouseTrackingActive() && e2.isFromSource(InputDevice.SOURCE_MOUSE)) {
                     // If moving with mouse pointer while pressing button, report that instead of scroll.
-                    sendMouseEventCode(e, TerminalEmulator.MOUSE_LEFT_BUTTON_MOVED, true)
+                    sendMouseEventCode(e2, TerminalEmulator.MOUSE_LEFT_BUTTON_MOVED, true)
                 } else {
                     scrolledWithFinger = true
-                    val adjustedDistanceY = distanceY + mScrollRemainder
+                    val adjustedDistanceY = dy + mScrollRemainder
                     val deltaRows = (adjustedDistanceY / mRenderer!!.mFontLineSpacing).toInt()
                     mScrollRemainder = adjustedDistanceY - deltaRows * mRenderer!!.mFontLineSpacing
-                    doScroll(e, deltaRows)
+                    doScroll(e2, deltaRows)
                 }
                 return true
             }
@@ -167,6 +161,7 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
                 return true
             }
 
+            @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
             override fun onFling(e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
                 if (mEmulator == null) return true
                 // Do not start scrolling until last fling has been taken care of:
@@ -205,17 +200,17 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
                 return false
             }
 
-            override fun onDoubleTap(event: MotionEvent): Boolean {
+            override fun onDoubleTap(e: MotionEvent): Boolean {
                 // Do not treat is as a single confirmed tap - it may be followed by zoom.
                 return false
             }
 
-            override fun onLongPress(event: MotionEvent) {
+            override fun onLongPress(e: MotionEvent) {
                 if (mGestureRecognizer.isInProgress()) return
-                if (mClient?.onLongPress(event) == true) return
+                if (mClient?.onLongPress(e) == true) return
                 if (!isSelectingText) {
                     performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    startTextSelectionMode(event)
+                    startTextSelectionMode(e)
                 }
             }
         })
@@ -524,7 +519,6 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    @TargetApi(23)
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (mEmulator == null) return true
         val action = event.action
@@ -584,6 +578,7 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
         return super.onKeyPreIme(keyCode, event)
     }
 
+    @Suppress("DEPRECATION")
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (TERMINAL_VIEW_KEY_LOGGING_ENABLED)
             mClient!!.logInfo(LOG_TAG, "onKeyDown(keyCode=$keyCode, isSystem()=${event.isSystem}, event=$event)")
@@ -719,7 +714,7 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
             return true
 
         val term = mTermSession!!.emulator
-        val code = KeyHandler.getCode(keyCode, keyMod, term!!.isCursorKeysApplicationMode(), term.isKeypadApplicationMode())
+        val code = KeyHandler.getCode(keyCode, keyMod, term.isCursorKeysApplicationMode(), term.isKeypadApplicationMode())
             ?: return false
         mTermSession!!.write(code)
         return true
@@ -854,7 +849,6 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
     /**
      * Define functions required for AutoFill API
      */
-    @RequiresApi(api = Build.VERSION_CODES.O)
     override fun autofill(value: AutofillValue) {
         if (value.isText) {
             mTermSession!!.write(value.textValue.toString())
@@ -863,27 +857,22 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
         resetAutoFill()
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     override fun getAutofillType(): Int {
         return mAutoFillType
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     override fun getAutofillHints(): Array<String> {
         return mAutoFillHints
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     override fun getAutofillValue(): AutofillValue {
         return AutofillValue.forText("")
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     override fun getImportantForAutofill(): Int {
         return mAutoFillImportance
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Synchronized
     private fun resetAutoFill() {
         // Restore none type so that AutoFill UI isn't shown anymore.
@@ -893,8 +882,6 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
     }
 
     fun getAutoFillManagerService(): AutofillManager? {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return null
-
         return try {
             context?.getSystemService(AutofillManager::class.java)
         } catch (e: Exception) {
@@ -905,8 +892,6 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
 
     val isAutoFillEnabled: Boolean
         get() {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return false
-
             return try {
                 val autofillManager = getAutoFillManagerService()
                 autofillManager?.isEnabled == true
@@ -918,23 +903,16 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
 
     @Synchronized
     fun requestAutoFillUsername() {
-        requestAutoFill(
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) arrayOf(AUTOFILL_HINT_USERNAME)
-            else null
-        )
+        requestAutoFill(arrayOf(AUTOFILL_HINT_USERNAME))
     }
 
     @Synchronized
     fun requestAutoFillPassword() {
-        requestAutoFill(
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) arrayOf(AUTOFILL_HINT_PASSWORD)
-            else null
-        )
+        requestAutoFill(arrayOf(AUTOFILL_HINT_PASSWORD))
     }
 
     @Synchronized
     fun requestAutoFill(autoFillHints: Array<String>?) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         if (autoFillHints == null || autoFillHints.isEmpty()) return
 
         try {
@@ -956,7 +934,6 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
 
     @Synchronized
     fun cancelRequestAutoFill() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         if (mAutoFillType == AUTOFILL_TYPE_NONE) return
 
         try {
@@ -1174,12 +1151,9 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
      * Define functions required for long hold toolbar.
      */
     private val mShowFloatingToolbar = Runnable {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            textSelectionActionMode?.hide(0) // hide off.
-        }
+        textSelectionActionMode?.hide(0) // hide off.
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private fun showFloatingToolbar() {
         if (textSelectionActionMode != null) {
             val delay = ViewConfiguration.getDoubleTapTimeout()
@@ -1187,7 +1161,6 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     fun hideFloatingToolbar() {
         if (textSelectionActionMode != null) {
             removeCallbacks(mShowFloatingToolbar)
@@ -1196,7 +1169,7 @@ class TerminalView(context: Context, attributes: AttributeSet?) : View(context, 
     }
 
     fun updateFloatingToolbarVisibility(event: MotionEvent) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && textSelectionActionMode != null) {
+        if (textSelectionActionMode != null) {
             when (event.actionMasked) {
                 MotionEvent.ACTION_MOVE -> hideFloatingToolbar()
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> showFloatingToolbar()

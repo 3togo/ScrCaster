@@ -45,7 +45,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build debug APKs
-        run: bash build.sh clean assembleDebug testDebugUnitTest
+        run: bash build.sh clean assembleDebug testDebugUnitTest lintDebug
 
       - name: Collect APKs
         run: |

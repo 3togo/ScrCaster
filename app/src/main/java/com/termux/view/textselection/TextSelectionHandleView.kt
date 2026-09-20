@@ -4,17 +4,16 @@ import android.annotation.SuppressLint
 import android.graphics.Canvas
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.os.Build
 import android.os.SystemClock
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.PopupWindow
+import androidx.appcompat.content.res.AppCompatResources
 
 import io.github.togo3.scrcaster.R
 import com.termux.view.TerminalView
-import com.termux.view.support.PopupWindowCompatGingerbread
 
 @SuppressLint("ViewConstructor")
 class TextSelectionHandleView(
@@ -52,8 +51,8 @@ class TextSelectionHandleView(
     private var mLastTime: Long = 0
 
     init {
-        mHandleLeftDrawable = context.getDrawable(R.drawable.text_select_handle_left_material)
-        mHandleRightDrawable = context.getDrawable(R.drawable.text_select_handle_right_material)
+        mHandleLeftDrawable = AppCompatResources.getDrawable(context, R.drawable.text_select_handle_left_material)
+        mHandleRightDrawable = AppCompatResources.getDrawable(context, R.drawable.text_select_handle_right_material)
 
         setOrientation(mInitialOrientation)
     }
@@ -68,13 +67,9 @@ class TextSelectionHandleView(
         mHandle?.setBackgroundDrawable(null)
         mHandle?.animationStyle = 0
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mHandle?.windowLayoutType = WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL
-            mHandle?.enterTransition = null
-            mHandle?.exitTransition = null
-        } else {
-            mHandle?.let { PopupWindowCompatGingerbread.setWindowLayoutType(it, WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL) }
-        }
+        mHandle?.windowLayoutType = WindowManager.LayoutParams.TYPE_APPLICATION_SUB_PANEL
+        mHandle?.enterTransition = null
+        mHandle?.exitTransition = null
         mHandle?.contentView = this
     }
 

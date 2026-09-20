@@ -2,8 +2,8 @@ package io.github.togo3.scrcaster.pages
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.SystemClock
+import androidx.core.net.toUri
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
@@ -1246,7 +1246,7 @@ internal class DeviceTabViewModel(
     private fun openHandoffPage(target: HandoffTarget) {
         runCatching {
             AppRuntime.context.startActivity(
-                Intent(Intent.ACTION_VIEW, Uri.parse(target.payload))
+                Intent(Intent.ACTION_VIEW, target.payload.toUri())
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
             )
         }

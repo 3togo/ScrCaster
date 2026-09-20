@@ -33,7 +33,7 @@ class AdbSocketStream(
 
     private val latch = CountDownLatch(1)
     private val latchOk = AtomicBoolean(false)
-    private val queue = LinkedBlockingQueue<Any>()
+    private val queue = LinkedBlockingQueue<StreamChunk>()
 
     private val writeLock = ReentrantLock()
     private val writeCondition: Condition = writeLock.newCondition()
@@ -41,7 +41,10 @@ class AdbSocketStream(
     @Volatile
     private var inflightWrites = 0
 
-    private object EndOfStreamMarker
+    private sealed class StreamChunk {
+        data class Data(val bytes: ByteArray) : StreamChunk()
+        data object EndOfStream : StreamChunk()
+    }
 
     val inputStream: InputStream = InStream()
     val outputStream: OutputStream = OutStream()
@@ -64,12 +67,12 @@ class AdbSocketStream(
     }
 
     internal fun onData(data: ByteArray) {
-        if (!closed) queue.offer(data)
+        if (!closed) queue.offer(StreamChunk.Data(data))
     }
 
     internal fun forceClose() {
         closed = true
-        queue.offer(EndOfStreamMarker)
+        queue.offer(StreamChunk.EndOfStream)
         latch.countDown()
         if (flowControlWindow > 0) {
             writeLock.lock()
@@ -93,7 +96,7 @@ class AdbSocketStream(
         if (remoteId != 0) runCatching {
             sender(A_CLSE, localId, remoteId, ByteArray(0))
         }
-        queue.offer(EndOfStreamMarker)
+        queue.offer(StreamChunk.EndOfStream)
         if (flowControlWindow > 0) {
             writeLock.lock()
             try { writeCondition.signalAll() } finally { writeLock.unlock() }
@@ -120,11 +123,15 @@ class AdbSocketStream(
                 }
                 chunk = null
                 this.off = 0
-                val next = queue.take()
-                if (next === EndOfStreamMarker) {
-                    return -1
+                val next = queue.poll(5, TimeUnit.SECONDS)
+                if (next == null) {
+                    if (closed) return -1
+                    continue
                 }
-                chunk = next as ByteArray
+                when (next) {
+                    is StreamChunk.EndOfStream -> return -1
+                    is StreamChunk.Data -> chunk = next.bytes
+                }
             }
         }
 

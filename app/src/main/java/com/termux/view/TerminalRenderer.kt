@@ -114,7 +114,7 @@ class TerminalRenderer(
                 // smileys which android font renders as wide.
                 // If this is detected, we draw this code point scaled to match what wcwidth() expects.
                 val measuredCodePointWidth = if (codePoint < asciiMeasures.size) asciiMeasures[codePoint] else mTextPaint.measureText(
-                    line as CharArray,
+                    line,
                     currentCharIndex, charsForCodePoint
                 )
                 val fontWidthMismatch = Math.abs(measuredCodePointWidth / mFontWidth - codePointWcWidth) > 0.01

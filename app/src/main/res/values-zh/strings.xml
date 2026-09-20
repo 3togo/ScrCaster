@@ -35,7 +35,6 @@
     <string name="text_default">默认</string>
     <string name="text_global">全局</string>
     <string name="text_loading">加载中…</string>
-    <string name="text_not_available">没有可用的</string>
     <string name="text_off">关闭</string>
     <string name="text_auto">自动</string>
     <string name="text_custom">自定义</string>
@@ -66,11 +65,7 @@
     <string name="label_device_name">设备名</string>
     <string name="label_name">名称</string>
     <string name="label_wlan_pairing_code">WLAN 配对码</string>
-    <string name="label_resolution">分辨率</string>
-    <string name="label_codec">编解码器</string>
     <string name="label_status">状态</string>
-    <string name="label_fps">FPS</string>
-    <string name="label_touches">触点</string>
 
     <!-- Device Tab -->
     <string name="device_title">设备</string>
@@ -119,7 +114,7 @@
     <string name="device_handoff_no_port">读不到本机无线调试端口。正在打开电视接收页以便手动填写；也可先开启无线调试后重试。</string>
     <string name="device_handoff_failed">无法连接电视接收端。请保持电视上的二维码界面打开后重新扫码。</string>
     <string name="vm_scan_qr_pairing">扫描到服务 %1$s 的 adb 配对二维码</string>
-    <string name="cd_show_qr_pairing">显示配对二维码</string>
+
     <string name="device_quick_connect_title">连接 / 添加设备</string>
     <string name="device_status_mirroring">投屏中</string>
     <string name="device_status_resolution">分辨率</string>
@@ -127,7 +122,6 @@
     <string name="device_status_adb_connected">ADB 已连接</string>
     <string name="device_status_adb_disconnected">ADB 未连接</string>
     <string name="device_status_current">当前设备</string>
-    <string name="device_status_state">状态</string>
     <string name="device_status_idle">空闲</string>
     <string name="device_config_audio_forwarding">音频转发</string>
     <string name="device_config_audio_forwarding_desc">转发设备音频到本机 (Android 11+)</string>
@@ -160,7 +154,7 @@
     <string name="fullscreen_text_input_failed">文本输入失败</string>
     <string name="fullscreen_clipboard_empty">本机剪贴板为空或不是文本</string>
     <string name="fullscreen_legacy_paste_failed">legacy 粘贴失败</string>
-    <string name="fullscreen_clipboard_sync_failed">剪贴板同步粘贴失败，可尝试开启 --legacy-paste</string>
+    <string name="fullscreen_clipboard_sync_failed">剪贴板同步粘贴失败，可尝试开启 —legacy-paste</string>
     <string name="fullscreen_start_app_failed">启动应用失败：%1$s</string>
     <string name="fullscreen_debug_resolution">分辨率：%1$sx%2$s</string>
     <string name="fullscreen_debug_fps">帧率：%1$s</string>
@@ -180,8 +174,6 @@
     <!-- Settings - Theme -->
     <string name="section_theme">主题</string>
     <string name="section_appearance">外观</string>
-    <string name="pref_title_appearance_mode">外观模式</string>
-    <string name="pref_summary_appearance_mode">选择应用的外观模式</string>
     <string name="pref_title_monet">Monet 颜色</string>
     <string name="pref_summary_monet">开启后使用 Monet 动态配色</string>
     <string name="pref_title_monet_key_color">Monet Key Color</string>
@@ -196,8 +188,6 @@
     <string name="pref_summary_floating_bottom_bar">使用 Apple 风格的悬浮底栏</string>
     <string name="pref_title_liquid_glass">液态玻璃</string>
     <string name="pref_summary_liquid_glass">启用悬浮底栏的液态玻璃效果</string>
-    <string name="pref_title_smooth_corners">平滑圆角</string>
-    <string name="pref_summary_smooth_corners">启用全局平滑圆角效果</string>
     <string name="pref_title_theme_settings">主题设置</string>
     <string name="pref_summary_theme_settings">外观、模糊、导航等设置</string>
     <string name="pref_blur_none">无</string>
@@ -261,7 +251,6 @@
     <string name="section_scrcpy_server">scrcpy-server</string>
     <string name="pref_title_custom_binary">自定义 binary</string>
     <string name="pref_title_custom_binary_version">自定义 binary version</string>
-    <string name="pref_title_remote_path">Remote Path</string>
 
     <!-- Settings - ADB -->
     <string name="section_adb">ADB</string>
@@ -282,8 +271,8 @@
     <string name="pref_adb_key_remove">移除</string>
     <string name="pref_adb_key_regenerate">重新生成</string>
     <string name="pref_adb_key_export">导出</string>
-    <string name="pref_adb_key_export_private_summary">导出私钥到...</string>
-    <string name="pref_adb_key_export_public_summary">导出公钥到...</string>
+    <string name="pref_adb_key_export_private_summary">导出私钥到…</string>
+    <string name="pref_adb_key_export_public_summary">导出公钥到…</string>
     <string name="pref_adb_key_export_to_clipboard">剪贴板</string>
     <string name="pref_adb_key_export_to_file">文件</string>
     <string name="pref_adb_key_exported_clipboard">已导出到剪贴板</string>
@@ -303,7 +292,7 @@
     <string name="pref_title_auto_reconnect">自动重连已配对设备</string>
     <string name="pref_summary_auto_reconnect">自动发现开启无线调试的设备，更新快速设备的随机端口并尝试连接（效果比较随缘）</string>
     <string name="pref_title_auto_load_apps">连接后自动获取应用列表</string>
-    <string name="pref_summary_auto_load_apps">ADB 连接成功后立刻执行 --list-apps，用于补全最近任务列表应用名</string>
+    <string name="pref_summary_auto_load_apps">ADB 连接成功后立刻执行 —list-apps，用于补全最近任务列表应用名</string>
     <string name="pref_warning_list_apps">--list-apps 操作可能非常耗时（特别是在息屏状态下），启用后可能导致连接设备后阻塞过久！</string>
     <string name="pref_cannot_open_settings">无法打开设置</string>
 
@@ -522,7 +511,6 @@
     <string name="fm_unknown">未知</string>
 
     <!-- Scrcpy All Options -->
-    <string name="profile_default_name">配置</string>
     <string name="profile_new_name">新配置</string>
     <string name="scrcpyopt_title">所有参数</string>
     <string name="scrcpyopt_cd_profile_manage">配置管理</string>
@@ -604,7 +592,6 @@
     <string name="vm_scrcpy_stopped_adb_disconnected">scrcpy 已停止，ADB 已断开</string>
     <string name="vm_scrcpy_stopped">scrcpy 已停止</string>
     <string name="vm_adb_connection_failed">ADB 连接失败</string>
-    <string name="vm_adb_disconnected">ADB 已断开</string>
     <string name="vm_pairing_succeeded">配对成功</string>
     <string name="vm_pairing_failed">配对失败</string>
     <string name="vm_auto_reconnect_succeeded">ADB 自动重连成功</string>
@@ -625,11 +612,9 @@
     <string name="vm_app_started_on_display">已在当前显示启动应用：%1$s</string>
     <string name="vm_start_app_fallback_adb">通过 scrcpy 控制通道启动应用失败，回退 ADB</string>
     <string name="vm_app_started_via_adb">已通过 ADB 启动应用：%1$s</string>
-    <string name="vm_adb_connected_detail">ADB 已连接：model=%1$s</string>
     <string name="vm_failed_app_list_msg">获取应用列表失败：%1$s</string>
     <string name="vm_scrcpy_requested_app">已请求 scrcpy 启动应用：%1$s</string>
     <string name="vm_scrcpy_start_app_failed">通过 scrcpy 控制通道启动应用失败：%1$s</string>
-    <string name="vm_scrcpy_started_detail">scrcpy 已启动：device=%1$s</string>
     <string name="vm_scrcpy_stopped_adb_disconnected_log">scrcpy 已停止，ADB 已断开</string>
     <string name="vm_failed_recent_tasks_msg">获取最近任务失败：%1$s</string>
     <string name="vm_legacy_paste_injected">已使用 legacy paste 注入本机剪贴板文本</string>
@@ -640,12 +625,10 @@
     <string name="vm_decoder_init_failed">解码器初始化失败：%1$s</string>
     <string name="vm_decoder_error_restarting">解码器错误，正在重启会话</string>
     <string name="vm_ime_text_failed">输入法文本提交失败：%1$s</string>
-    <string name="vm_adb_disconnected_device">ADB 已断开：%1$s</string>
     <string name="vm_mdns_updated">mDNS 发现新端口，已更新快速设备：%1$s:%2$s -> %1$s:%3$s</string>
     <string name="vm_quick_probe_success">ADB 快速探测连接成功：%1$s:%2$s</string>
     <string name="vm_device_switched_profile">当前连接设备已切换为配置：%1$s</string>
 
-    <string name="usb_connection">USB 连接</string>
     <string name="usb_device_detected">检测到 USB 设备</string>
     <string name="usb_device_disconnected">USB 设备已断开</string>
     <string name="usb_permission_request_hint">请在设备上授权USB调试权限</string>
@@ -658,7 +641,6 @@
     <string name="tv_remote_accessibility_label">ScrCaster 遥控器按键处理</string>
     <string name="tv_remote_accessibility_description">让电视遥控器返回键打开 ScrCaster 播放控制。不会读取屏幕内容。</string>
 
-    <string name="pref_update_prerelease_latest">，当前为最新的预发布版本</string>
     <string name="scrcpyopt_fullscreen_fill">全屏填充</string>
     <string name="scrcpyopt_fullscreen_fill_summary">视频适配屏幕的方式：适应（留黑边）、拉伸或裁剪填充</string>
     <string name="scrcpyopt_aspect_ratio">宽高比</string>

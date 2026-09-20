@@ -1,5 +1,26 @@
 # Change Log
 
+## 0.6.4
+
+- 合并: 上游 Miuzarte/ScrcpyForAndroid 分支
+  - 整合 QR 码配对功能（扫码 + 展码双向配对）
+  - 整合液态玻璃 UI 组件（`CombinedBackdrop`/`InnerShadow`/`Lens`/`Vibrancy`）
+  - 整合主题设置页面（Monet 调色板/模糊模式/导航过渡风格）
+  - 整合自定义手柄名称设置
+  - 整合 QR 码生成库（`io.nayuki.qrcodegen`）
+- 修复: `AdbSocketStream` 流控窗口改用 `ReentrantLock`+`Condition` 替代 `Object` 监视器
+- 修复: `NativeAdbService.shellBatch` marker 分割逻辑提取为可测试的 `parseBatchOutput`
+- 修复: 所有编译器警告（`SpinnerItemImpl`→`DropdownImpl`、冗余安全调用、`com.kyant.backdrop`→miuix blur）
+- 修复: `com.termux.view` 第三方包 14 个警告（冗余 cast、不必要 `lateinit`、参数名匹配、弃用 API 抑制）
+- 修复: Android Lint 警告（`ObsoleteSdkInt`、`UnusedResources`、`TypographyDashes/Ellipsis`、`UseKtx`、`DefaultLocale`、`UseCompatLoadingForDrawables`）
+- 测试: 新增 `AdbSocketStreamTest`（22 个测试，覆盖流控窗口/读写/关闭语义）
+- 测试: 新增 `FullscreenVirtualButtonDockTest`（11 个测试，覆盖枚举双向转换）
+- 测试: 新增 `NativeAdbServiceBatchTest`（12 个测试，覆盖 marker 分割逻辑）
+- 测试: 新增 `AdbPairingResultTest`（7 个测试）
+- 测试: 新增 `AndroidConnectionPreferencesTest`（13 个测试，覆盖 SharedPreferences load/save）
+- 测试: 新增 `QrPairingDialogTest`（Android 仪器测试）
+- CI: PR 检查流程新增 `lintDebug` 步骤
+
 ## 0.6.3
 
 - 修复: 自动重连已配对设备时未正确更新端口

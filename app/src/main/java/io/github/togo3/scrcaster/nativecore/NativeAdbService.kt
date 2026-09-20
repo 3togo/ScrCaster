@@ -273,7 +273,7 @@ object NativeAdbService {
             return emptyList()
         }
         val markers = List(builder.commands.size) { index ->
-            "__SCRCPY_BATCH_${System.nanoTime()}_${index}__"
+            "BATCH${index}END"
         }
         val script = buildString {
             builder.commands.forEachIndexed { index, command ->

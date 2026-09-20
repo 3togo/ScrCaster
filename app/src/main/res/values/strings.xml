@@ -35,7 +35,6 @@
     <string name="text_default">Default</string>
     <string name="text_global">Global</string>
     <string name="text_loading">Loading…</string>
-    <string name="text_not_available">None available</string>
     <string name="text_off">Off</string>
     <string name="text_auto">Auto</string>
     <string name="text_custom">Custom</string>
@@ -66,11 +65,7 @@
     <string name="label_device_name">Device name</string>
     <string name="label_name">Name</string>
     <string name="label_wlan_pairing_code">WLAN pairing code</string>
-    <string name="label_resolution">Resolution</string>
-    <string name="label_codec">Codec</string>
     <string name="label_status">Status</string>
-    <string name="label_fps">FPS</string>
-    <string name="label_touches">Touches</string>
 
     <!-- Device Tab -->
     <string name="device_title">Devices</string>
@@ -119,7 +114,7 @@
     <string name="device_handoff_no_port">Could not read this phone\'s Wireless debugging port. Opening the receiver page to enter it manually; alternatively turn Wireless debugging on and retry.</string>
     <string name="device_handoff_failed">Could not reach the TV receiver. Keep its QR screen open, then scan again.</string>
     <string name="vm_scan_qr_pairing">Scanned an adb pairing QR for service %1$s</string>
-    <string name="cd_show_qr_pairing">Show pairing QR code</string>
+
     <string name="device_quick_connect_title">Connect / Add device</string>
     <string name="device_status_mirroring">Mirroring</string>
     <string name="device_status_resolution">Resolution</string>
@@ -127,7 +122,6 @@
     <string name="device_status_adb_connected">ADB connected</string>
     <string name="device_status_adb_disconnected">ADB disconnected</string>
     <string name="device_status_current">Current device</string>
-    <string name="device_status_state">Status</string>
     <string name="device_status_idle">Idle</string>
     <string name="device_config_audio_forwarding">Audio forwarding</string>
     <string name="device_config_audio_forwarding_desc">Forward device audio to this device (Android 11+)</string>
@@ -160,7 +154,7 @@
     <string name="fullscreen_text_input_failed">Text input failed</string>
     <string name="fullscreen_clipboard_empty">Local clipboard is empty or not text</string>
     <string name="fullscreen_legacy_paste_failed">Legacy paste failed</string>
-    <string name="fullscreen_clipboard_sync_failed">Clipboard sync paste failed, try enabling --legacy-paste</string>
+    <string name="fullscreen_clipboard_sync_failed">Clipboard sync paste failed, try enabling —legacy-paste</string>
     <string name="fullscreen_start_app_failed">Start app failed: %1$s</string>
     <string name="fullscreen_debug_resolution">Resolution: %1$sx%2$s</string>
     <string name="fullscreen_debug_fps">FPS: %1$s</string>
@@ -176,13 +170,10 @@
     <string name="pref_update_found">, found new version %1$s</string>
     <string name="pref_update_latest">, already the latest version</string>
     <string name="pref_update_newer">, newer than latest release %1$s</string>
-    <string name="pref_update_prerelease_latest">, on the latest prerelease</string>
 
     <!-- Settings - Theme -->
     <string name="section_theme">Theme</string>
     <string name="section_appearance">Appearance</string>
-    <string name="pref_title_appearance_mode">Appearance mode</string>
-    <string name="pref_summary_appearance_mode">Select the app\'s appearance mode</string>
     <string name="pref_title_monet">Monet color</string>
     <string name="pref_summary_monet">Uses Monet dynamic color when enabled</string>
     <string name="pref_title_monet_key_color">Monet Key Color</string>
@@ -197,8 +188,6 @@
     <string name="pref_summary_floating_bottom_bar">Use Apple-style floating bottom bar</string>
     <string name="pref_title_liquid_glass">Liquid glass</string>
     <string name="pref_summary_liquid_glass">Enable liquid glass effect on the floating bottom bar</string>
-    <string name="pref_title_smooth_corners">Smooth corners</string>
-    <string name="pref_summary_smooth_corners">Enable global smooth corner effect</string>
     <string name="pref_title_theme_settings">Theme settings</string>
     <string name="pref_summary_theme_settings">Appearance, blur, navigation and more</string>
     <string name="pref_blur_none">None</string>
@@ -262,7 +251,6 @@
     <string name="section_scrcpy_server">scrcpy-server</string>
     <string name="pref_title_custom_binary">Custom binary</string>
     <string name="pref_title_custom_binary_version">Custom binary version</string>
-    <string name="pref_title_remote_path">Remote Path</string>
 
     <!-- Settings - ADB -->
     <string name="section_adb">ADB</string>
@@ -283,8 +271,8 @@
     <string name="pref_adb_key_remove">Remove</string>
     <string name="pref_adb_key_regenerate">Regenerate</string>
     <string name="pref_adb_key_export">Export</string>
-    <string name="pref_adb_key_export_private_summary">Export private key to...</string>
-    <string name="pref_adb_key_export_public_summary">Export public key to...</string>
+    <string name="pref_adb_key_export_private_summary">Export private key to…</string>
+    <string name="pref_adb_key_export_public_summary">Export public key to…</string>
     <string name="pref_adb_key_export_to_clipboard">Clipboard</string>
     <string name="pref_adb_key_export_to_file">File</string>
     <string name="pref_adb_key_exported_clipboard">Exported to clipboard</string>
@@ -304,7 +292,7 @@
     <string name="pref_title_auto_reconnect">Auto reconnect paired devices</string>
     <string name="pref_summary_auto_reconnect">Automatically discover devices with wireless debugging enabled, update quick device random ports, and attempt connection (results may vary)</string>
     <string name="pref_title_auto_load_apps">Auto fetch app list after connection</string>
-    <string name="pref_summary_auto_load_apps">Execute --list-apps immediately after successful ADB connection to populate app names in recent tasks list</string>
+    <string name="pref_summary_auto_load_apps">Execute —list-apps immediately after successful ADB connection to populate app names in recent tasks list</string>
     <string name="pref_warning_list_apps">--list-apps may be very time-consuming (especially when screen is off); enabling may cause excessive blocking after connecting to the device!</string>
     <string name="pref_cannot_open_settings">Cannot open settings</string>
 
@@ -523,7 +511,6 @@
     <string name="fm_unknown">Unknown</string>
 
     <!-- Scrcpy All Options -->
-    <string name="profile_default_name">Profile</string>
     <string name="profile_new_name">New Profile</string>
     <string name="scrcpyopt_title">All Parameters</string>
     <string name="scrcpyopt_cd_profile_manage">Profile Management</string>
@@ -614,7 +601,6 @@
     <string name="vm_scrcpy_stopped_adb_disconnected">scrcpy stopped, ADB disconnected</string>
     <string name="vm_scrcpy_stopped">scrcpy stopped</string>
     <string name="vm_adb_connection_failed">ADB connection failed</string>
-    <string name="vm_adb_disconnected">ADB disconnected</string>
     <string name="vm_pairing_succeeded">Pairing succeeded</string>
     <string name="vm_pairing_failed">Pairing failed</string>
     <string name="vm_auto_reconnect_succeeded">ADB auto-reconnect succeeded</string>
@@ -635,11 +621,9 @@
     <string name="vm_app_started_on_display">App started on current display: %1$s</string>
     <string name="vm_start_app_fallback_adb">Failed to start app via scrcpy control channel, falling back to ADB</string>
     <string name="vm_app_started_via_adb">App started via ADB: %1$s</string>
-    <string name="vm_adb_connected_detail">ADB connected: model=%1$s</string>
     <string name="vm_failed_app_list_msg">Failed to get app list: %1$s</string>
     <string name="vm_scrcpy_requested_app">Scrcpy requested to start app: %1$s</string>
     <string name="vm_scrcpy_start_app_failed">Failed to start app via scrcpy control channel: %1$s</string>
-    <string name="vm_scrcpy_started_detail">scrcpy started: device=%1$s</string>
     <string name="vm_scrcpy_stopped_adb_disconnected_log">scrcpy stopped, ADB disconnected</string>
     <string name="vm_failed_recent_tasks_msg">Failed to get recent tasks: %1$s</string>
     <string name="vm_legacy_paste_injected">Used legacy paste to inject local clipboard text</string>
@@ -650,12 +634,10 @@
     <string name="vm_decoder_init_failed">Decoder initialization failed: %1$s</string>
     <string name="vm_decoder_error_restarting">Decoder error, restarting session</string>
     <string name="vm_ime_text_failed">IME text submission failed: %1$s</string>
-    <string name="vm_adb_disconnected_device">ADB disconnected: %1$s</string>
     <string name="vm_mdns_updated">mDNS discovered new port, updated quick device: %1$s:%2$s -> %1$s:%3$s</string>
     <string name="vm_quick_probe_success">ADB quick probe connection succeeded: %1$s:%2$s</string>
     <string name="vm_device_switched_profile">Current connected device switched to profile: %1$s</string>
 
-    <string name="usb_connection">USB Connection</string>
     <string name="usb_device_detected">USB device detected</string>
     <string name="usb_device_disconnected">USB device disconnected</string>
     <string name="usb_permission_request_hint">Please authorize USB debugging on the device</string>

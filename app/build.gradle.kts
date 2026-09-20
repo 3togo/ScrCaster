@@ -169,7 +169,7 @@ androidComponents {
 
 dependencies {
     implementation(project(":core"))
-    implementation("com.google.zxing:core:3.5.3")
+    implementation(libs.zxing.core)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -203,10 +203,11 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
-    implementation("com.github.promeg:tinypinyin:3.0.0")
+    implementation(libs.tinypinyin)
 
     testImplementation(libs.junit)
     testImplementation(libs.zxing.core)
+    testImplementation(libs.mockito.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

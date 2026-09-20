@@ -11,6 +11,5 @@
     <color name="ic_launcher_device">#FFEEE8</color>
     <color name="ic_launcher_foreground_main">#CB7C62</color>
     <color name="ic_launcher_foreground_sub">#733420</color>
-    <color name="colorPrimary">#CB7C62</color>
     <color name="colorOnPrimary">#FFEEE8</color>
 </resources>

@@ -1,8 +1,8 @@
 package io.github.togo3.scrcaster
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
+import androidx.core.net.toUri
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
@@ -48,6 +48,6 @@ class HandoffActivity : ComponentActivity() {
 
     /** No app-side port available: fall back to the TV's web form so the user can type it once. */
     private fun openFallbackPage(url: String) {
-        runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+        runCatching { startActivity(Intent(Intent.ACTION_VIEW, url.toUri())) }
     }
 }

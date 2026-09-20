@@ -1,20 +1,10 @@
 <resources>
     <string name="tv_title">ScrCaster</string>
-    <string name="tv_instructions">Connect both devices to the same network. Enable network debugging on the phone. During playback, Back or Menu opens receiver controls; arrows and OK control the phone.</string>
-    <string name="tv_host">Phone IP address or hostname</string>
-    <string name="tv_port">ADB connection port</string>
-    <string name="tv_audio">Play phone audio on TV</string>
-    <string name="tv_connect">Connect / Resume</string>
-    <string name="tv_pair">Pair wireless debugging</string>
     <string name="tv_disconnect">Disconnect</string>
     <string name="tv_disconnected">Disconnected</string>
-    <string name="tv_ready">Ready. Use arrows to select a control and OK to activate it.</string>
-    <string name="tv_invalid_address">Enter a phone address and a port between 1 and 65535.</string>
     <string name="tv_connecting">Connecting… Accept the debugging prompt on your phone if shown.</string>
     <string name="tv_connected">Connected. Back during playback opens the receiver menu.</string>
-    <string name="tv_pair_port">Pairing port</string>
     <string name="tv_pair_code">Six-digit pairing code</string>
-    <string name="tv_pair_instructions">On the phone, open Wireless debugging → Pair device with pairing code. Enter its pairing port and code here. The connection port on the previous screen is separate.</string>
     <string name="tv_invalid_pairing">Enter a valid pairing port and six-digit code.</string>
     <string name="tv_pairing">Pairing…</string>
     <string name="tv_pair_required">Your phone requires pairing with this TV. Open Wireless debugging → Pair device with pairing code on the phone.</string>
