@@ -6,6 +6,17 @@ import android.graphics.Rect
 import android.util.Rational
 import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import io.github.togo3.scrcaster.TvRemoteAccess
+import io.github.togo3.scrcaster.rememberTvRemoteAccess
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -98,16 +109,30 @@ fun StreamScreen(activity: StreamActivity) {
         CompositionLocalProvider(
             LocalSnackbarController provides snackbarController,
         ) {
-            FullscreenControlRoute(
-                scrcpy = scrcpy,
-                onBack = activity::finish,
-                onReceiverBack = if (activity.tvReceiverMode) activity::showTvMenu else null,
-                isInPip = isInPip,
-                onVideoBoundsInWindowChanged = {
-                    // 记录下一次进入 PiP 时可用的 sourceRectHint
-                    pipSourceRectHint = it
-                },
-            )
+            Box {
+                FullscreenControlRoute(
+                    scrcpy = scrcpy,
+                    onBack = activity::finish,
+                    onReceiverBack = if (activity.tvReceiverMode) activity::showTvMenu else null,
+                    isInPip = isInPip,
+                    onVideoBoundsInWindowChanged = {
+                        // 记录下一次进入 PiP 时可用的 sourceRectHint
+                        pipSourceRectHint = it
+                    },
+                )
+                if (activity.tvReceiverMode && !isInPip) {
+                    val access = rememberTvRemoteAccess()
+                    if (access != TvRemoteAccess.ACTIVE) {
+                        // A non-focusable notice must never steal remote keys from playback.
+                        Text(
+                            stringResource(access.message),
+                            color = Color.White,
+                            modifier = Modifier.align(Alignment.TopCenter).padding(16.dp)
+                                .background(Color.Black.copy(alpha = 0.85f)).padding(12.dp),
+                        )
+                    }
+                }
+            }
         }
     }
 }

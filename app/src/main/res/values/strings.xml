@@ -650,11 +650,12 @@
     <string name="tv_remote_accessibility_label">ScrCaster remote key handler</string>
     <string name="tv_remote_accessibility_description">Lets Back, Menu, or holding and releasing OK open ScrCaster playback controls. It does not read screen content.</string>
 
-    <string name="tv_remote_controls_enabled">TV remote controls: enabled</string>
-    <string name="tv_remote_controls_disabled">TV remote controls: disabled</string>
+    <string name="tv_remote_controls_enabled">Remote accessibility: active. Back, Menu, or hold OK to open playback controls.</string>
+    <string name="tv_remote_controls_disabled">Remote accessibility: off. Back, Menu, and holding OK may not work on this TV.</string>
     <string name="tv_remote_controls_enable">Enable TV remote controls</string>
     <string name="tv_remote_controls_manage">Manage TV remote controls</string>
     <string name="tv_remote_controls_help">In Accessibility settings, enable “ScrCaster remote key handler” so Back opens playback controls. It does not read screen content.</string>
-    <string name="tv_remote_settings_unavailable">Open TV system settings → Accessibility → ScrCaster remote key handler.</string>
+    <string name="tv_remote_settings_unavailable">This TV does not expose standard Accessibility settings. If no accessibility option is available, use the computer-assisted installer to enable remote controls.</string>
 
+    <string name="tv_remote_controls_waiting">Remote accessibility: enabled, but the key handler is not running yet. Remote menu keys may not work.</string>
 </resources>

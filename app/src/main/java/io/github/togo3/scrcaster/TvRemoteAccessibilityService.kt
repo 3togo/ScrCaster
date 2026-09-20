@@ -1,6 +1,9 @@
 package io.github.togo3.scrcaster
 
 import android.accessibilityservice.AccessibilityService
+import android.content.Intent
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
 
@@ -11,6 +14,26 @@ import android.view.accessibility.AccessibilityEvent
  * It never requests or inspects window content, and every other key passes through.
  */
 class TvRemoteAccessibilityService : AccessibilityService() {
+    companion object {
+        private val connectionState = MutableStateFlow(false)
+        internal val connected = connectionState.asStateFlow()
+    }
+
+    override fun onServiceConnected() {
+        super.onServiceConnected()
+        connectionState.value = true
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        connectionState.value = false
+        return super.onUnbind(intent)
+    }
+
+    override fun onDestroy() {
+        connectionState.value = false
+        super.onDestroy()
+    }
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
 
     override fun onInterrupt() = Unit

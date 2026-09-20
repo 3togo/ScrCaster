@@ -651,11 +651,12 @@
     <string name="scrcpyopt_render_fit_crop">裁剪填充短边</string>
     <string name="scrcpyopt_render_fit_long_edge">裁剪填充长边</string>
 
-    <string name="tv_remote_controls_enabled">电视遥控器控制：已启用</string>
-    <string name="tv_remote_controls_disabled">电视遥控器控制：未启用</string>
+    <string name="tv_remote_controls_enabled">遥控器无障碍服务：运行中。按返回、菜单或长按 OK 可打开播放控制。</string>
+    <string name="tv_remote_controls_disabled">遥控器无障碍服务：未启用。本电视的返回、菜单和长按 OK 可能无法使用。</string>
     <string name="tv_remote_controls_enable">启用电视遥控器控制</string>
     <string name="tv_remote_controls_manage">管理电视遥控器控制</string>
     <string name="tv_remote_controls_help">在无障碍设置中启用“ScrCaster 遥控器按键处理”，即可使用返回键打开播放控制。不会读取屏幕内容。</string>
-    <string name="tv_remote_settings_unavailable">请打开电视系统设置 → 无障碍 → ScrCaster 遥控器按键处理。</string>
+    <string name="tv_remote_settings_unavailable">本电视未提供标准无障碍设置。如系统设置中也没有此选项，请通过电脑安装工具启用遥控器控制。</string>
 
+    <string name="tv_remote_controls_waiting">遥控器无障碍服务：已启用，但按键处理服务尚未运行。遥控器菜单按键可能无法使用。</string>
 </resources>

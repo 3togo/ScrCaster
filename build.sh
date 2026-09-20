@@ -4,6 +4,7 @@ set -euo pipefail
 project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 cd "$project_dir"
 source "$project_dir/scripts/enable-tv-remote.sh"
+source "$project_dir/scripts/optimize-apk.sh"
 
 usage() {
     cat <<'EOF'
@@ -56,6 +57,8 @@ than one device attached, choose device numbers (e.g. 1,2) or all; in a
 non-interactive shell set ANDROID_SERIAL to select the target device.
 TV installs also enable and verify ScrCaster remote-key accessibility support.
 Other enabled accessibility services are preserved.
+ADB installs precompile the app for faster startup (may take a few minutes).
+Set SCRCASTER_SKIP_DEXOPT=1 to skip this installation-time optimization.
 Requires Bash, Java 17+ (JDK 21 recommended), and Git for missing submodules.
 Automatic command-line tools download requires Linux x86_64, curl, unzip and
 sha256sum. Other hosts must provide sdkmanager themselves.
@@ -369,6 +372,8 @@ install_apk_on_device() {
     local install_output
     if install_output="$("${adb_cmd[@]}" install -r "$apk" 2>&1)"; then
         echo "$install_output"
+        optimize_installed_apk "$1" "$2" "$application_id"
+        # Restore remote support last: OEM lifecycle/force-stop operations may disable it.
         enable_tv_remote "$1" "$2" "$application_id" || die "APK installed, but TV remote setup failed on $2."
         return 0
     fi
@@ -379,6 +384,8 @@ install_apk_on_device() {
             [[ ${universal##*/} == *universal* ]] || continue
             log "No native libraries for this device in $apk; retrying with the universal APK."
             if "${adb_cmd[@]}" install -r "$universal"; then
+                optimize_installed_apk "$1" "$2" "$application_id"
+                # Restore remote support last: OEM lifecycle/force-stop operations may disable it.
                 enable_tv_remote "$1" "$2" "$application_id" || die "APK installed, but TV remote setup failed on $2."
                 return 0
             fi

@@ -137,6 +137,14 @@ Coocaa/Skyworth TVs without an Accessibility settings page. For example:
 ANDROID_SERIAL=192.168.123.128:5555 ./build.sh --install apk -PabiList=armeabi-v7a
 ```
 
+ADB installs also ask Android to precompile the APK for faster cold starts.
+This can add a few minutes to installation on older TVs; it does not run at app
+launch. Set `SCRCASTER_SKIP_DEXOPT=1` to skip it. To optimize an existing install:
+
+```bash
+bash scripts/optimize-apk.sh adb 192.168.123.128:5555 io.github.togo3.scrcaster.tvdebug
+```
+
 This setup requires the ADB installer; installing the APK from a file manager
 cannot grant accessibility access automatically.
 

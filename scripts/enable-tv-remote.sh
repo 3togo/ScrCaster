@@ -2,6 +2,8 @@
 # Source this file from the installer, or run it with ADB SERIAL APPLICATION_ID.
 # Coocaa firmware may hide Accessibility settings entirely. Keep this post-install
 # step: merely installing the APK does not enable the key-filter service.
+# After cold-start benchmarks using am force-stop, rerun this setup and check
+# dumpsys accessibility: Coocaa may clear the enabled service during force-stop.
 # The shell has permission to configure accessibility; an ordinary APK does not.
 enable_tv_remote() {
     local adb=$1 serial=$2 package=$3
