@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
  * 
  * All network operations are executed on Dispatchers.IO.
  */
-object NativeAdbService {
+object NativeAdbService : AdbService {
     private val transport = DirectAdbTransport
     private val mutex = Mutex()
 
@@ -50,7 +50,7 @@ object NativeAdbService {
             transport.keyName = value
         }
 
-    suspend fun pair(host: String, port: Int, pairingCode: String): AdbPairingResult =
+    override suspend fun pair(host: String, port: Int, pairingCode: String): AdbPairingResult =
         mutex.withLock {
             val h = host.trim()
             val code = pairingCode.trim()
@@ -68,10 +68,10 @@ object NativeAdbService {
 
     // 服务发现不触碰 ADB 连接, 故不取连接锁 (否则长时间发现会阻塞连接与心跳);
     // 同类服务的并发发现由 AdbMdnsDiscoverer 内部串行化
-    suspend fun discoverPairingService(
-        timeoutMs: Long = 12_000,
-        includeLanDevices: Boolean = true,
-        matchInstanceName: String? = null,
+    override suspend fun discoverPairingService(
+        timeoutMs: Long,
+        includeLanDevices: Boolean,
+        matchInstanceName: String?,
     ): Pair<String, Int>? = withContext(Dispatchers.IO) {
         try {
             transport.discoverPairingService(timeoutMs, includeLanDevices)
@@ -81,11 +81,11 @@ object NativeAdbService {
         }
     }
 
-    suspend fun discoverConnectService(
-        timeoutMs: Long = 12_000,
-        includeLanDevices: Boolean = true,
-        matchInstanceName: String? = null,
-        matchHostAddress: String? = null,
+    override suspend fun discoverConnectService(
+        timeoutMs: Long,
+        includeLanDevices: Boolean,
+        matchInstanceName: String?,
+        matchHostAddress: String?,
     ): Pair<String, Int>? = withContext(Dispatchers.IO) {
         try {
             transport.discoverConnectService(
@@ -106,10 +106,10 @@ object NativeAdbService {
      * @param timeout 连接超时时间, 默认 10 秒, 传入 Duration.INFINITE 表示不超时
      * (此时握手读阶段仍保留 60s soTimeout 兜底, 避免无响应设备永久锁死连接锁)
      */
-    suspend fun connect(
+    override suspend fun connect(
         host: String,
         port: Int,
-        timeout: Duration = 10.seconds,
+        timeout: Duration,
     ) = withContext(Dispatchers.IO) {
         mutex.withLock {
             Log.i(TAG, "connect(): host=$host port=$port timeout=$timeout")
@@ -171,11 +171,11 @@ object NativeAdbService {
      * @param outputStream USB 输出流
      * @param deviceId USB 设备 ID
      */
-    suspend fun connectUsb(
+    override suspend fun connectUsb(
         inputStream: InputStream,
         outputStream: OutputStream,
-        deviceId: Int? = null,
-        abortHandshake: (() -> Unit)? = null,
+        deviceId: Int?,
+        abortHandshake: (() -> Unit)?,
     ) = withContext(Dispatchers.IO) {
         mutex.withLock {
             Log.i(TAG, "connectUsb(): deviceId=$deviceId")
@@ -236,7 +236,7 @@ object NativeAdbService {
      * 强制中断当前正在进行的连接
      * 通过关闭 pendingSocket 来让阻塞中的 socket.connect() 立即抛出异常
      */
-    fun cancelPendingConnect() {
+    override fun cancelPendingConnect() {
         val socket = pendingSocket
         if (socket != null) {
             Log.i(TAG, "cancelPendingConnect(): 强制关闭pendingSocket以中断连接")
@@ -247,27 +247,27 @@ object NativeAdbService {
     /**
      * Close the current ADB connection immediately.
      */
-    suspend fun disconnect() = withContext(Dispatchers.IO) {
+    override suspend fun disconnect() = withContext(Dispatchers.IO) {
         mutex.withLock {
             disconnectInternal()
         }
     }
 
-    suspend fun isConnected(): Boolean = mutex.withLock {
+    override suspend fun isConnected(): Boolean = mutex.withLock {
         connection?.isAlive() == true
     }
 
     /**
      * Execute a shell command on the connected device and return stdout text.
      */
-    suspend fun shell(command: String): String {
+    override suspend fun shell(command: String): String {
         val conn = snapshotConnection()
         val response = conn.shell(command)
         Log.d(TAG, "command: $command, response: $response")
         return response
     }
 
-    suspend fun shellBatch(build: ShellBatchBuilder.() -> Unit): List<String> {
+    override suspend fun shellBatch(build: ShellBatchBuilder.() -> Unit): List<String> {
         val builder = ShellBatchBuilder().apply(build)
         if (builder.commands.isEmpty()) {
             return emptyList()
@@ -304,10 +304,10 @@ object NativeAdbService {
         return outputs
     }
 
-    suspend fun startApp(
+    override suspend fun startApp(
         packageName: String,
-        displayId: Int? = null,
-        forceStop: Boolean = false,
+        displayId: Int?,
+        forceStop: Boolean,
     ): String {
         val normalizedPackageName = packageName.trim()
         require(normalizedPackageName.isNotBlank()) { "package name is blank" }

@@ -5,6 +5,7 @@ import android.os.Parcelable
 import io.github.togo3.scrcaster.models.ConnectionTarget
 import io.github.togo3.scrcaster.models.DeviceConnectionType
 import io.github.togo3.scrcaster.nativecore.AdbPairingResult
+import io.github.togo3.scrcaster.nativecore.AdbService
 import io.github.togo3.scrcaster.nativecore.NativeAdbService
 import io.github.togo3.scrcaster.nativecore.UsbAdbTunnel
 import io.github.togo3.scrcaster.storage.ScrcpyOptions
@@ -33,7 +34,7 @@ internal data class DeviceAdbSessionState(
 ): Parcelable
 
 internal class DeviceAdbConnectionCoordinator(
-    private val adbService: NativeAdbService = NativeAdbService,
+    private val adbService: AdbService = NativeAdbService,
 ) {
     suspend fun connectWithTimeout(host: String, port: Int, timeoutMs: Long) {
         withContext(Dispatchers.IO) {

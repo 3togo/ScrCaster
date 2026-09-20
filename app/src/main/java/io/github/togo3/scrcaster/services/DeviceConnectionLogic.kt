@@ -1,6 +1,6 @@
 package io.github.togo3.scrcaster.services
 
-import io.github.togo3.scrcaster.nativecore.NativeAdbService
+import io.github.togo3.scrcaster.nativecore.AdbService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -23,7 +23,7 @@ data class ConnectedDeviceInfo(
  * - Returns a lightweight [ConnectedDeviceInfo] structure with commonly-used properties.
  */
 internal suspend fun fetchConnectedDeviceInfo(
-    adbService: NativeAdbService,
+    adbService: AdbService,
     host: String,
     port: Int,
 ): ConnectedDeviceInfo = withContext(Dispatchers.IO) {
