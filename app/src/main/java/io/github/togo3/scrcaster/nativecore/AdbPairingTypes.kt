@@ -22,13 +22,23 @@ import javax.net.ssl.SSLEngine
 import javax.net.ssl.X509ExtendedKeyManager
 import javax.net.ssl.X509ExtendedTrustManager
 
-/**
- * Helper that wraps a generated/private RSA key and exposes ADB-compatible
- * public key bytes and an `SSLContext` configured for the pairing handshake.
- */
+internal fun interface Base64Encoder {
+    fun encode(data: ByteArray): ByteArray
+
+    companion object {
+        val Android: Base64Encoder = Base64Encoder { data ->
+            android.util.Base64.encode(data, android.util.Base64.NO_WRAP)
+        }
+        val Java: Base64Encoder = Base64Encoder { data ->
+            java.util.Base64.getEncoder().encode(data)
+        }
+    }
+}
+
 internal class AdbPairingKey(
     private val privateKey: PrivateKey,
     private val alias: String,
+    private val base64Encoder: Base64Encoder = Base64Encoder.Android,
 ) {
 
     private val rsaPrivateKey: RSAPrivateKey = privateKey as? RSAPrivateKey
@@ -56,7 +66,7 @@ internal class AdbPairingKey(
             .generateCertificate(ByteArrayInputStream(encoded)) as X509Certificate
     }
 
-    val adbPublicKey: ByteArray by lazy { rsaPublicKey.adbEncoded(alias) }
+    val adbPublicKey: ByteArray by lazy { rsaPublicKey.adbEncoded(alias, base64Encoder) }
 
     val sslContext: SSLContext by lazy {
         val conscryptProvider: Provider = Conscrypt.newProviderBuilder().build()
@@ -185,7 +195,7 @@ private fun BigInteger.toAdbEncoded(): IntArray {
  * Encode an RSA public key into the ADB public-key blob format with a UTF-8
  * name suffix.
  */
-private fun RSAPublicKey.adbEncoded(name: String): ByteArray {
+private fun RSAPublicKey.adbEncoded(name: String, base64Encoder: Base64Encoder): ByteArray {
     val r32 = BigInteger.ZERO.setBit(32)
     val n0inv = modulus.remainder(r32).modInverse(r32).negate()
     val r = BigInteger.ZERO.setBit(ANDROID_PUBKEY_MODULUS_SIZE * 8)
@@ -198,7 +208,7 @@ private fun RSAPublicKey.adbEncoded(name: String): ByteArray {
     rr.toAdbEncoded().forEach { buffer.putInt(it) }
     buffer.putInt(publicExponent.toInt())
 
-    val base64 = android.util.Base64.encode(buffer.array(), android.util.Base64.NO_WRAP)
+    val base64 = base64Encoder.encode(buffer.array())
     val suffix = " $name\u0000".toByteArray(Charsets.UTF_8)
     return ByteArray(base64.size + suffix.size).also {
         base64.copyInto(it)
