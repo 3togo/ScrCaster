@@ -1,8 +1,6 @@
 package io.github.togo3.scrcaster.connection
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,7 +14,8 @@ import io.github.togo3.scrcaster.scrcpy.ScrcpyAspectRatio
  * connection UI. It depends only on [PlaybackPreferences] plus a [setPlayback] callback,
  * so it can render inside either layout. When [focus] is provided (TV / remote navigation)
  * each control participates in the surrounding [FocusChain]; when null, controls are plain
- * touch targets.
+ * touch targets. The containing dialog owns scrolling so its title, controls, and
+ * back button share one bounded scroll container.
  */
 @Composable
 internal fun PlaybackSettingsBody(
@@ -28,7 +27,7 @@ internal fun PlaybackSettingsBody(
     val custom = options.aspectRatio == "CUSTOM"
     val keys = listOfNotNull("audio", "fill", "ratio", "custom".takeIf { custom }, "back")
     val chain = focus ?: rememberFocusChain(keys, remote = false)
-    Column(modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(stringResource(R.string.connection_settings_help))
         ActionButton(stringResource(if (options.audio) R.string.connection_audio_on else R.string.connection_audio_off),
             chain.modifier("audio")) {

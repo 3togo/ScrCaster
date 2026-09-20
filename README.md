@@ -129,6 +129,18 @@ comma-separated numbers such as `1,2`, or `all`. Each selected device receives
 the APK matching its ABI, with the universal APK as a fallback. For a
 non-interactive install, set `ANDROID_SERIAL` to select one device.
 
+ADB installs on TVs automatically enable and verify ScrCaster’s remote-key
+accessibility service, preserving other enabled services. This also works on
+Coocaa/Skyworth TVs without an Accessibility settings page. For example:
+
+```bash
+ANDROID_SERIAL=192.168.123.128:5555 ./build.sh --install apk -PabiList=armeabi-v7a
+```
+
+This setup requires the ADB installer; installing the APK from a file manager
+cannot grant accessibility access automatically.
+
+
 ## 截图
 
 <p align="center">

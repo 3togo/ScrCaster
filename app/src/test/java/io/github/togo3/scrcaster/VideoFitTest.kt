@@ -1,11 +1,26 @@
 package io.github.togo3.scrcaster
 
 import io.github.togo3.scrcaster.scrcpy.videoFitSize
+import io.github.togo3.scrcaster.scrcpy.videoSourceCrop
+import io.github.togo3.scrcaster.scrcpy.VideoCrop
 import io.github.togo3.scrcaster.scrcpy.videoCrop
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class VideoFitTest {
+    @Test
+    fun defaultLongEdgePreservesWideAndTallPhoneFrames() {
+        assertEquals(VideoCrop(0, 0, 1920, 864), videoSourceCrop(1920, 864, "LONG_EDGE", 0.0, 16.0 / 9))
+        assertEquals(VideoCrop(0, 0, 864, 1920), videoSourceCrop(864, 1920, "LONG_EDGE", 0.0, 16.0 / 9))
+    }
+
+    @Test
+    fun explicitAspectAndShortEdgeFillStillCrop() {
+        val expected = VideoCrop(192, 0, 1536, 864)
+        assertEquals(expected, videoSourceCrop(1920, 864, "LONG_EDGE", 16.0 / 9, 16.0 / 9))
+        assertEquals(expected, videoSourceCrop(1920, 864, "CROP", 0.0, 16.0 / 9))
+    }
+
     @Test
     fun cropRemovesWideSourceEdgesBeforeScaling() {
         val crop = videoCrop(1920, 864, 16.0 / 9.0)

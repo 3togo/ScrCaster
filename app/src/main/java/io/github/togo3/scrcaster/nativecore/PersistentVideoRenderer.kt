@@ -6,8 +6,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
 import android.view.Surface
-import io.github.togo3.scrcaster.core.AspectRatio
-import io.github.togo3.scrcaster.scrcpy.videoCrop
+import io.github.togo3.scrcaster.scrcpy.videoSourceCrop
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.atomic.AtomicReference
 
@@ -65,7 +64,7 @@ class PersistentVideoRenderer {
     /** Target display aspect ratio (width/height) to crop the video to; 0.0 keeps the device ratio. */
     @Volatile
     private var aspectTarget = 0.0
-    /** Receiver surface aspect ratio, used by both crop-to-fill modes in Device mode. */
+    /** Receiver surface aspect ratio, used by short-edge fill in Device mode. */
     @Volatile
     private var displayAspect = 0.0
     /** Current decoded video frame size, used for aspect-ratio cropping. */
@@ -278,15 +277,9 @@ class PersistentVideoRenderer {
      */
     fun sourceCrop(): IntArray {
         if (videoW <= 0 || videoH <= 0) return intArrayOf(0, 0, 0, 0)
-        val target = when {
-            aspectTarget > 0 -> aspectTarget
-            fitMode == Fit.CROP || fitMode == Fit.LONG_EDGE -> displayAspect
-            else -> 0.0
-        }
-        // Both explicit presets and the receiver ratio follow the mirrored source orientation.
-        // A landscape TV ratio therefore becomes portrait when the phone is portrait.
-        val oriented = AspectRatio.orientToSource(target, videoW, videoH)
-        val crop = videoCrop(videoW, videoH, oriented)
+        // Do not pre-crop DEVICE + LONG_EDGE to the receiver ratio. That silently trims
+        // wide phone frames before long-edge scaling; VideoFitTest covers this regression.
+        val crop = videoSourceCrop(videoW, videoH, fitMode.name, aspectTarget, displayAspect)
         return intArrayOf(crop.x, crop.y, crop.width, crop.height)
     }
 

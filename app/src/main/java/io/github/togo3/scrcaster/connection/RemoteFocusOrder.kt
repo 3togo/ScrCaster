@@ -5,6 +5,7 @@ internal fun connectionHomeFocusKeys(
     deviceCount: Int,
     streaming: Boolean,
     busy: Boolean,
+    remote: Boolean = false,
 ): List<String> = buildList {
     repeat(deviceCount) { index ->
         add("device-$index")
@@ -16,6 +17,7 @@ internal fun connectionHomeFocusKeys(
     add("methods")
     add("settings")
     if (streaming) add("disconnect")
+    if (remote) add("remote-controls")
     if (busy) add("cancel")
 }
 

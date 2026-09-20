@@ -35,6 +35,14 @@ class RemoteFocusOrderTest {
         )
     }
 
+    @Test fun remoteControlsAreReachableOnlyOnTv() {
+        val tv = RemoteFocusOrder(connectionHomeFocusKeys(1, false, false, remote = true))
+        assertEquals("remote-controls", tv.next("settings"))
+        assertEquals("device-0", tv.next("remote-controls"))
+        val phone = RemoteFocusOrder(connectionHomeFocusKeys(1, false, false))
+        assertEquals("device-0", phone.next("settings"))
+    }
+
     @Test fun refreshParticipatesInRemoteTraversal() {
         val order = RemoteFocusOrder(
             connectionHomeFocusKeys(deviceCount = 1, streaming = false, busy = false),

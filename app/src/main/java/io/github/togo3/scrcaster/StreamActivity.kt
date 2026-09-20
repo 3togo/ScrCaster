@@ -157,6 +157,7 @@ class StreamActivity: FragmentActivity() {
     val usePhoneAspect = MutableStateFlow(false)
     private var aspectDialog: AlertDialog? = null
     private var tvMenu: AlertDialog? = null
+    private val menuHold = TvMenuHold()
     var tvRemote: TvRemoteController? = null
         private set
     private var lastInputError = -3001L
@@ -169,7 +170,10 @@ class StreamActivity: FragmentActivity() {
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus && !isInPictureInPictureMode) enterImmersivePlayback()
-        else if (!hasFocus) enqueueTv { release() }
+        else if (!hasFocus) {
+            menuHold.cancel()
+            enqueueTv { release() }
+        }
     }
 
     override fun onResume() {
@@ -204,6 +208,7 @@ class StreamActivity: FragmentActivity() {
     }
 
     override fun onPause() {
+        menuHold.cancel()
         enqueueTv { release() }
         super.onPause()
     }
@@ -214,8 +219,25 @@ class StreamActivity: FragmentActivity() {
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (!tvReceiverMode) return super.dispatchKeyEvent(event)
         val code = event.keyCode
+        if (BuildConfig.DEBUG) android.util.Log.d("TvRemote", "Receiver key: $event")
         if (code == KeyEvent.KEYCODE_BACK || code == KeyEvent.KEYCODE_MENU) {
             if (event.action == KeyEvent.ACTION_UP && !event.isCanceled) showTvMenu()
+            return true
+        }
+        // Both accessibility and normal Activity delivery must use the same hold state.
+        // Do not forward OK on key-down: that clicks the phone before a menu hold ends.
+        if (code == KeyEvent.KEYCODE_DPAD_CENTER || code == KeyEvent.KEYCODE_ENTER) {
+            when (menuHold.key(event.action, code, event.eventTime, event.repeatCount, event.isCanceled, event.isLongPress)) {
+                TvMenuHold.Result.MENU -> showTvMenu()
+                TvMenuHold.Result.TAP -> {
+                    val meta = event.metaState
+                    enqueueTv {
+                        key(KeyEvent.ACTION_DOWN, code, metaState = meta)
+                        key(KeyEvent.ACTION_UP, code, metaState = meta)
+                    }
+                }
+                TvMenuHold.Result.NONE -> Unit
+            }
             return true
         }
         val mapped = phoneMappings[code]
@@ -234,6 +256,7 @@ class StreamActivity: FragmentActivity() {
     }
 
     internal fun showTvMenu() {
+        menuHold.cancel()
         if (tvMenu?.isShowing == true) return
         enqueueTv { release() }
         tvMenu = AlertDialog.Builder(this)
@@ -447,17 +470,16 @@ class StreamActivity: FragmentActivity() {
                 ?.finish()
         }
 
-        internal fun handleTvBackFromAccessibility(event: KeyEvent): Boolean {
+        internal fun handleTvKeyFromAccessibility(event: KeyEvent): Boolean {
+            // A popup owns a different window. Let its OK/Back events reach the dialog;
+            // intercepting them here would reopen the menu or prevent selecting its items.
             val activity = currentActivityRef?.get()
                 ?.takeIf {
                     it.tvReceiverMode && !it.isFinishing && !it.isDestroyed &&
                         it.hasWindowFocus()
                 }
                 ?: return false
-            if (event.action == KeyEvent.ACTION_UP && !event.isCanceled) {
-                activity.runOnUiThread { activity.showTvMenu() }
-            }
-            return true
+            return activity.dispatchKeyEvent(event)
         }
     }
 }

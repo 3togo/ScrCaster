@@ -1,5 +1,6 @@
 package io.github.togo3.scrcaster.scrcpy
 
+import io.github.togo3.scrcaster.core.AspectRatio
 import kotlin.math.roundToInt
 
 /** Display size for an aspect-preserving video inside (or overflowing) a container. */
@@ -7,6 +8,22 @@ data class VideoFitSize(val width: Float, val height: Float)
 
 /** Centred source rectangle selected before it is scaled to the receiver. */
 data class VideoCrop(val x: Int, val y: Int, val width: Int, val height: Int)
+
+/** Device + long-edge scaling preserves the source; only fill mode crops to the receiver. */
+fun videoSourceCrop(
+    sourceWidth: Int,
+    sourceHeight: Int,
+    mode: String,
+    aspectTarget: Double,
+    receiverAspect: Double,
+): VideoCrop {
+    val target = when {
+        aspectTarget > 0 -> aspectTarget
+        mode == "CROP" -> receiverAspect
+        else -> 0.0
+    }
+    return videoCrop(sourceWidth, sourceHeight, AspectRatio.orientToSource(target, sourceWidth, sourceHeight))
+}
 
 fun videoCrop(sourceWidth: Int, sourceHeight: Int, targetAspect: Double): VideoCrop {
     if (sourceWidth <= 0 || sourceHeight <= 0) return VideoCrop(0, 0, 0, 0)

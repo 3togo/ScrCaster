@@ -648,6 +648,13 @@
     <string name="language_chinese">Chinese</string>
 
     <string name="tv_remote_accessibility_label">ScrCaster remote key handler</string>
-    <string name="tv_remote_accessibility_description">Lets the TV remote Back button open ScrCaster playback controls. It does not read screen content.</string>
+    <string name="tv_remote_accessibility_description">Lets Back, Menu, or holding and releasing OK open ScrCaster playback controls. It does not read screen content.</string>
+
+    <string name="tv_remote_controls_enabled">TV remote controls: enabled</string>
+    <string name="tv_remote_controls_disabled">TV remote controls: disabled</string>
+    <string name="tv_remote_controls_enable">Enable TV remote controls</string>
+    <string name="tv_remote_controls_manage">Manage TV remote controls</string>
+    <string name="tv_remote_controls_help">In Accessibility settings, enable “ScrCaster remote key handler” so Back opens playback controls. It does not read screen content.</string>
+    <string name="tv_remote_settings_unavailable">Open TV system settings → Accessibility → ScrCaster remote key handler.</string>
 
 </resources>

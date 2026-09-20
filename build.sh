@@ -3,6 +3,7 @@ set -euo pipefail
 
 project_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 cd "$project_dir"
+source "$project_dir/scripts/enable-tv-remote.sh"
 
 usage() {
     cat <<'EOF'
@@ -53,6 +54,8 @@ A fresh SDK defaults to ~/Android/Sdk. SDKMANAGER can select a specific tool.
 APK installation uses adb from the SDK, from $ADB, or from PATH. With more
 than one device attached, choose device numbers (e.g. 1,2) or all; in a
 non-interactive shell set ANDROID_SERIAL to select the target device.
+TV installs also enable and verify ScrCaster remote-key accessibility support.
+Other enabled accessibility services are preserved.
 Requires Bash, Java 17+ (JDK 21 recommended), and Git for missing submodules.
 Automatic command-line tools download requires Linux x86_64, curl, unzip and
 sha256sum. Other hosts must provide sdkmanager themselves.
@@ -334,6 +337,9 @@ install_apk_on_device() {
     eval "$previous_nullglob"
     ((${#apks[@]})) || die "No APK found in $apk_dir."
 
+    local application_id
+    application_id=$(sed -nE 's/^[[:space:]]*"applicationId": "([a-zA-Z0-9_.]+)",?$/\1/p' "$apk_dir/output-metadata.json")
+    [[ -n "$application_id" && "$application_id" != *$'\n'* ]] || die "Cannot read APK application ID."
     local apk=""
     if ((${#apks[@]} == 1)); then
         apk=${apks[0]}
@@ -363,6 +369,7 @@ install_apk_on_device() {
     local install_output
     if install_output="$("${adb_cmd[@]}" install -r "$apk" 2>&1)"; then
         echo "$install_output"
+        enable_tv_remote "$1" "$2" "$application_id" || die "APK installed, but TV remote setup failed on $2."
         return 0
     fi
     echo "$install_output"
@@ -371,7 +378,10 @@ install_apk_on_device() {
         for universal in "${apks[@]}"; do
             [[ ${universal##*/} == *universal* ]] || continue
             log "No native libraries for this device in $apk; retrying with the universal APK."
-            "${adb_cmd[@]}" install -r "$universal" && return 0
+            if "${adb_cmd[@]}" install -r "$universal"; then
+                enable_tv_remote "$1" "$2" "$application_id" || die "APK installed, but TV remote setup failed on $2."
+                return 0
+            fi
             break
         done
     fi

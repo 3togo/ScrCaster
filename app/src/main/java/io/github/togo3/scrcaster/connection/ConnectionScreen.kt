@@ -47,7 +47,7 @@ internal fun ConnectionScreen(controller: ConnectionController, remote: Boolean)
 internal fun ConnectionContent(controller: ConnectionController, remote: Boolean) {
     val state by controller.state.collectAsState()
     val rememberedDevices = state.preferences.rememberedEndpoints
-    val keys = connectionHomeFocusKeys(rememberedDevices.size, state.streaming, state.busy)
+    val keys = connectionHomeFocusKeys(rememberedDevices.size, state.streaming, state.busy, remote)
     val focus = rememberFocusChain(keys, remote)
     var returnFocus by remember { mutableStateOf(if (rememberedDevices.isNotEmpty()) "device-0" else "qr") }
     LaunchedEffect(state.dialog, state.busy, rememberedDevices) {
@@ -135,6 +135,9 @@ internal fun ConnectionContent(controller: ConnectionController, remote: Boolean
                         }
                         if (state.streaming) ActionButton(stringResource(R.string.tv_disconnect), focus.modifier("disconnect"), enabled = !state.busy) {
                             returnFocus = "device-0"; controller.disconnect()
+                        }
+                        if (remote) TvRemoteSettings(focus.modifier("remote-controls")) {
+                            returnFocus = "remote-controls"
                         }
                         Text(stringResource(R.string.connection_remote_help), style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)

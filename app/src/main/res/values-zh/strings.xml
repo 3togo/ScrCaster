@@ -639,7 +639,7 @@
     <string name="language_chinese">中文</string>
 
     <string name="tv_remote_accessibility_label">ScrCaster 遥控器按键处理</string>
-    <string name="tv_remote_accessibility_description">让电视遥控器返回键打开 ScrCaster 播放控制。不会读取屏幕内容。</string>
+    <string name="tv_remote_accessibility_description">让电视遥控器返回键、菜单键或长按确认键后松开打开 ScrCaster 播放控制。不会读取屏幕内容。</string>
 
     <string name="scrcpyopt_fullscreen_fill">全屏填充</string>
     <string name="scrcpyopt_fullscreen_fill_summary">视频适配屏幕的方式：适应（留黑边）、拉伸或裁剪填充</string>
@@ -650,5 +650,12 @@
     <string name="scrcpyopt_render_fit_stretch">拉伸</string>
     <string name="scrcpyopt_render_fit_crop">裁剪填充短边</string>
     <string name="scrcpyopt_render_fit_long_edge">裁剪填充长边</string>
+
+    <string name="tv_remote_controls_enabled">电视遥控器控制：已启用</string>
+    <string name="tv_remote_controls_disabled">电视遥控器控制：未启用</string>
+    <string name="tv_remote_controls_enable">启用电视遥控器控制</string>
+    <string name="tv_remote_controls_manage">管理电视遥控器控制</string>
+    <string name="tv_remote_controls_help">在无障碍设置中启用“ScrCaster 遥控器按键处理”，即可使用返回键打开播放控制。不会读取屏幕内容。</string>
+    <string name="tv_remote_settings_unavailable">请打开电视系统设置 → 无障碍 → ScrCaster 遥控器按键处理。</string>
 
 </resources>
