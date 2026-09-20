@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kover)
     id("kotlin-parcelize")
 }
 
@@ -151,6 +152,27 @@ android {
         )
     }
 
+}
+
+kover {
+    currentProject {
+        instrumentation {
+            excludedClasses.addAll(listOf(
+                "com.termux.*",
+                "io.nayuki.*",
+            ))
+        }
+    }
+    reports {
+        total {
+            xml {
+                onCheck = true
+            }
+            html {
+                onCheck = true
+            }
+        }
+    }
 }
 
 kotlin {
