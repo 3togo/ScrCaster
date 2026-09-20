@@ -37,6 +37,7 @@ import io.github.togo3.scrcaster.R
 import io.github.togo3.scrcaster.constants.UiSpacing
 import io.github.togo3.scrcaster.password.PasswordPickerPopupContent
 import io.github.togo3.scrcaster.scrcpy.ClientOptions
+import io.github.togo3.scrcaster.scrcpy.GamepadHid
 import io.github.togo3.scrcaster.scrcpy.GamepadInputHandler
 import io.github.togo3.scrcaster.scrcpy.Scrcpy
 import io.github.togo3.scrcaster.scrcpy.TouchEventHandler
@@ -381,6 +382,7 @@ fun FullscreenControlScreen(
                 onDismiss = onBack,
                 showDebugInfo = fullscreenDebugInfo && !isInPip,
                 currentFps = currentFps,
+                gamepadDeviceName = asBundle.gamepadDeviceName.ifBlank { GamepadHid.NAME },
                 imeRequestToken = imeRequestToken,
                 enableBackHandler = false,
                 interactive = !isInPip,
@@ -598,6 +600,7 @@ fun FullscreenControlPage(
     onDismiss: () -> Unit,
     showDebugInfo: Boolean,
     currentFps: Float,
+    gamepadDeviceName: String = GamepadHid.NAME,
     imeRequestToken: Int = 0,
     enableBackHandler: Boolean = true,
     interactive: Boolean = true,
@@ -670,10 +673,12 @@ fun FullscreenControlPage(
         )
     }
 
+    val gamepadDeviceNameLatest = rememberUpdatedState(gamepadDeviceName)
     val gamepadHandler = remember(session.gamepadEnabled, scrcpy) {
         if (session.gamepadEnabled) {
             GamepadInputHandler(
                 scope = coroutineScope,
+                deviceName = { gamepadDeviceNameLatest.value },
                 onUhidCreate = { id, vendorId, productId, name, reportDesc ->
                     scrcpy.uhidCreate(id, vendorId, productId, name, reportDesc)
                 },

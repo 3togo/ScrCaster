@@ -20,6 +20,7 @@ import kotlinx.coroutines.sync.withLock
  */
 class GamepadInputHandler(
     private val scope: CoroutineScope,
+    private val deviceName: () -> String,
     private val onUhidCreate: suspend (
         id: Int,
         vendorId: Int,
@@ -144,7 +145,7 @@ class GamepadInputHandler(
                             id,
                             GamepadHid.VENDOR_ID,
                             GamepadHid.PRODUCT_ID,
-                            GamepadHid.NAME,
+                            deviceName(),
                             GamepadHid.reportDescriptor,
                         )
                         state.created = true

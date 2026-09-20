@@ -155,6 +155,7 @@ internal object AdbMdnsDiscoverer {
                 }
             }
 
+            @Suppress("DEPRECATION")
             runCatching {
                 nsdManager.resolveService(serviceToResolve, resolveListener)
             }.onFailure { error ->

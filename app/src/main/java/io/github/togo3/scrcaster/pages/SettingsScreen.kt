@@ -57,8 +57,6 @@ import top.yukonga.miuix.kmp.preference.ArrowPreference
 import top.yukonga.miuix.kmp.preference.OverlayDropdownPreference
 import top.yukonga.miuix.kmp.preference.SwitchPreference
 import top.yukonga.miuix.kmp.theme.MiuixTheme.colorScheme
-import top.yukonga.miuix.kmp.theme.ThemeColorSpec
-import top.yukonga.miuix.kmp.theme.ThemePaletteStyle
 import java.io.File
 import kotlin.math.roundToInt
 import android.provider.Settings as AndroidSettings
@@ -69,8 +67,6 @@ private val languages = listOf(
     R.string.language_chinese to "zh",
 )
 private const val TERMINAL_FONT_RELATIVE_PATH = "terminal/font.ttf"
-private val monetPaletteStyleOptions = ThemePaletteStyle.entries.map { it.name }
-private val monetColorSpecOptions = ThemeColorSpec.entries.map { it.name }
 
 suspend fun clearTerminalFont(context: Context) =
     withContext(Dispatchers.IO) {
@@ -176,8 +172,6 @@ fun SettingsPage(
         }
     }
 
-    val themeItems = AppSettings.ThemeModes.baseOptions.map { stringResource(it.labelResId) }
-
     val fullscreenVirtualButtonDock = remember(asBundle.fullscreenVirtualButtonDock) {
         FullscreenVirtualButtonDock.fromStoredValue(asBundle.fullscreenVirtualButtonDock)
     }
@@ -199,6 +193,13 @@ fun SettingsPage(
         mutableStateOf(
             if (asBundle.adbKeyName == AppSettings.ADB_KEY_NAME.defaultValue) ""
             else asBundle.adbKeyName,
+        )
+    }
+
+    var gamepadDeviceNameInput by rememberSaveable(asBundle.gamepadDeviceName) {
+        mutableStateOf(
+            if (asBundle.gamepadDeviceName == AppSettings.GAMEPAD_DEVICE_NAME.defaultValue) ""
+            else asBundle.gamepadDeviceName,
         )
     }
 
@@ -349,16 +350,12 @@ fun SettingsPage(
                         ),
                     ),
                 )
-                OverlayDropdownPreference(
-                    title = stringResource(R.string.pref_title_appearance_mode),
-                    summary = stringResource(R.string.pref_summary_appearance_mode),
-                    items = themeItems,
-                    selectedIndex = asBundle.themeBaseIndex
-                        .coerceIn(0, AppSettings.ThemeModes.baseOptions.lastIndex),
-                    onSelectedIndexChange = {
-                        asBundle = asBundle.copy(
-                            themeBaseIndex = it,
-                        )
+                ArrowPreference(
+                    title = stringResource(R.string.pref_title_theme_settings),
+                    summary = stringResource(R.string.pref_summary_theme_settings),
+                    onClick = {
+                        haptic.contextClick()
+                        navigator.push(RootScreen.ThemeSettings)
                     },
                 )
                 SwitchPreference(
@@ -418,10 +415,10 @@ fun SettingsPage(
                 SwitchPreference(
                     title = stringResource(R.string.pref_title_blur),
                     summary = stringResource(R.string.pref_summary_blur),
-                    checked = asBundle.blur,
+                    checked = asBundle.blur != AppSettings.BlurMode.NONE,
                     onCheckedChange = {
                         asBundle = asBundle.copy(
-                            blur = it,
+                            blur = if (it) AppSettings.BlurMode.GAUSSIAN else AppSettings.BlurMode.NONE,
                         )
                     },
                 )
@@ -441,12 +438,12 @@ fun SettingsPage(
                             )
                         },
                     )
-                    AnimatedVisibility(asBundle.floatingBottomBar && asBundle.blur) {
+                    AnimatedVisibility(asBundle.floatingBottomBar && asBundle.blur != AppSettings.BlurMode.NONE) {
                         Column {
                             SwitchPreference(
                                 title = stringResource(R.string.pref_title_liquid_glass),
                                 summary = stringResource(R.string.pref_summary_liquid_glass),
-                                checked = asBundle.floatingBottomBar && asBundle.blur
+                                checked = asBundle.floatingBottomBar && asBundle.blur != AppSettings.BlurMode.NONE
                                         && asBundle.floatingBottomBarBlur,
                                 onCheckedChange = {
                                     asBundle = asBundle.copy(
@@ -1301,6 +1298,36 @@ fun SettingsPage(
                         )
                     },
                 )
+                Column(
+                    modifier = Modifier.padding(vertical = UiSpacing.Large),
+                    verticalArrangement = Arrangement.spacedBy(UiSpacing.ContentVertical),
+                ) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = UiSpacing.Large),
+                        verticalArrangement = Arrangement.spacedBy(UiSpacing.Medium),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.pref_title_gamepad_device_name),
+                            fontWeight = FontWeight.Medium,
+                        )
+                        SuperTextField(
+                            value = gamepadDeviceNameInput,
+                            onValueChange = { gamepadDeviceNameInput = it },
+                            onFocusLost = {
+                                if (gamepadDeviceNameInput == AppSettings.GAMEPAD_DEVICE_NAME.defaultValue)
+                                    gamepadDeviceNameInput = ""
+                                asBundle = asBundle.copy(
+                                    gamepadDeviceName = gamepadDeviceNameInput
+                                        .ifBlank { AppSettings.GAMEPAD_DEVICE_NAME.defaultValue },
+                                )
+                            },
+                            label = AppSettings.GAMEPAD_DEVICE_NAME.defaultValue,
+                            useLabelAsPlaceholder = true,
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
             }
         }
 

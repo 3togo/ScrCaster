@@ -5,12 +5,19 @@ import android.os.Parcelable
 import androidx.annotation.StringRes
 import androidx.datastore.preferences.core.*
 import io.github.togo3.scrcaster.R
+import io.github.togo3.scrcaster.scrcpy.GamepadHid
 import io.github.togo3.scrcaster.scrcpy.Scrcpy
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.parcelize.Parcelize
 import top.yukonga.miuix.kmp.theme.ColorSchemeMode
 
 class AppSettings(context: Context): Settings(context, "AppSettings") {
+    object BlurMode {
+        const val NONE = 0
+        const val GAUSSIAN = 1
+        const val PROGRESSIVE = 2
+    }
+
     object ThemeModes {
         data class Option(
             @field:StringRes val labelResId: Int,
@@ -109,8 +116,20 @@ class AppSettings(context: Context): Settings(context, "AppSettings") {
             intPreferencesKey("monet_color_spec"),
             0,
         )
-        val BLUR = Pair(
-            booleanPreferencesKey("blur"),
+        val SQUIRCLE = Pair(
+            booleanPreferencesKey("squircle"),
+            true,
+        )
+        val BLUR_MODE = Pair(
+            intPreferencesKey("blur_mode"),
+            BlurMode.NONE,
+        )
+        val NAV_TRANSITION_STYLE = Pair(
+            intPreferencesKey("nav_transition_style"),
+            0,
+        )
+        val SWIPE_BACK = Pair(
+            booleanPreferencesKey("swipe_back"),
             true,
         )
         val FLOATING_BOTTOM_BAR = Pair(
@@ -314,6 +333,10 @@ class AppSettings(context: Context): Settings(context, "AppSettings") {
             booleanPreferencesKey("hide_device_logs"),
             false,
         )
+        val GAMEPAD_DEVICE_NAME = Pair(
+            stringPreferencesKey("gamepad_device_name"),
+            GamepadHid.NAME,
+        )
     }
 
     @Parcelize
@@ -325,7 +348,10 @@ class AppSettings(context: Context): Settings(context, "AppSettings") {
         val monetSeedIndex: Int,
         val monetPaletteStyle: Int,
         val monetColorSpec: Int,
-        val blur: Boolean,
+        val squircle: Boolean,
+        val blur: Int,
+        val navTransitionStyle: Int,
+        val swipeBack: Boolean,
         val floatingBottomBar: Boolean,
         val floatingBottomBarBlur: Boolean,
         val allowLandscapeOnTallPhones: Boolean,
@@ -382,6 +408,7 @@ class AppSettings(context: Context): Settings(context, "AppSettings") {
         val lastUpdateCheckAt: Long,
         val clearLogsOnExit: Boolean,
         val hideDeviceLogs: Boolean,
+        val gamepadDeviceName: String,
     ): Parcelable {
     }
 
@@ -393,7 +420,10 @@ class AppSettings(context: Context): Settings(context, "AppSettings") {
         bundleField(MONET_SEED_INDEX) { it.monetSeedIndex },
         bundleField(MONET_PALETTE_STYLE) { it.monetPaletteStyle },
         bundleField(MONET_COLOR_SPEC) { it.monetColorSpec },
-        bundleField(BLUR) { it.blur },
+        bundleField(SQUIRCLE) { it.squircle },
+        bundleField(BLUR_MODE) { it.blur },
+        bundleField(NAV_TRANSITION_STYLE) { it.navTransitionStyle },
+        bundleField(SWIPE_BACK) { it.swipeBack },
         bundleField(FLOATING_BOTTOM_BAR) { it.floatingBottomBar },
         bundleField(FLOATING_BOTTOM_BAR_BLUR) { it.floatingBottomBarBlur },
         bundleField(ALLOW_LANDSCAPE_ON_TALL_PHONES) { it.allowLandscapeOnTallPhones },
@@ -450,6 +480,7 @@ class AppSettings(context: Context): Settings(context, "AppSettings") {
         bundleField(LAST_UPDATE_CHECK_AT) { it.lastUpdateCheckAt },
         bundleField(CLEAR_LOGS_ON_EXIT) { it.clearLogsOnExit },
         bundleField(HIDE_DEVICE_LOGS) { it.hideDeviceLogs },
+        bundleField(GAMEPAD_DEVICE_NAME) { it.gamepadDeviceName },
     )
 
     val bundleState: StateFlow<Bundle> = createBundleState(::bundleFromPreferences)
@@ -462,7 +493,10 @@ class AppSettings(context: Context): Settings(context, "AppSettings") {
         monetSeedIndex = preferences.read(MONET_SEED_INDEX),
         monetPaletteStyle = preferences.read(MONET_PALETTE_STYLE),
         monetColorSpec = preferences.read(MONET_COLOR_SPEC),
-        blur = preferences.read(BLUR),
+        squircle = preferences.read(SQUIRCLE),
+        blur = preferences.read(BLUR_MODE),
+        navTransitionStyle = preferences.read(NAV_TRANSITION_STYLE),
+        swipeBack = preferences.read(SWIPE_BACK),
         floatingBottomBar = preferences.read(FLOATING_BOTTOM_BAR),
         floatingBottomBarBlur = preferences.read(FLOATING_BOTTOM_BAR_BLUR),
         allowLandscapeOnTallPhones = preferences.read(ALLOW_LANDSCAPE_ON_TALL_PHONES),
@@ -522,6 +556,7 @@ class AppSettings(context: Context): Settings(context, "AppSettings") {
         lastUpdateCheckAt = preferences.read(LAST_UPDATE_CHECK_AT),
         clearLogsOnExit = preferences.read(CLEAR_LOGS_ON_EXIT),
         hideDeviceLogs = preferences.read(HIDE_DEVICE_LOGS),
+        gamepadDeviceName = preferences.read(GAMEPAD_DEVICE_NAME),
     )
 
     suspend fun loadBundle() = loadBundle(::bundleFromPreferences)

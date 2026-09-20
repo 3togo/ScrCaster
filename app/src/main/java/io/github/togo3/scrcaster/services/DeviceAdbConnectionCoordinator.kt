@@ -4,6 +4,7 @@ import android.hardware.usb.UsbDevice
 import android.os.Parcelable
 import io.github.togo3.scrcaster.models.ConnectionTarget
 import io.github.togo3.scrcaster.models.DeviceConnectionType
+import io.github.togo3.scrcaster.nativecore.AdbPairingResult
 import io.github.togo3.scrcaster.nativecore.NativeAdbService
 import io.github.togo3.scrcaster.nativecore.UsbAdbTunnel
 import io.github.togo3.scrcaster.storage.ScrcpyOptions
@@ -12,12 +13,12 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.parcelize.Parcelize
-import kotlin.time.Duration.Companion.milliseconds
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
+import kotlin.time.Duration.Companion.milliseconds
 
 @Parcelize
 internal data class DeviceAdbSessionState(
@@ -128,7 +129,7 @@ internal class DeviceAdbConnectionCoordinator(
 
     suspend fun isConnected(timeoutMs: Long): Boolean {
         return withContext(Dispatchers.IO) {
-            withTimeout(timeoutMs) {
+            withTimeout(timeoutMs.milliseconds) {
                 adbService.isConnected()
             }
         }
@@ -141,7 +142,7 @@ internal class DeviceAdbConnectionCoordinator(
      */
     suspend fun probeConnection(timeoutMs: Long): Boolean {
         return withContext(Dispatchers.IO) {
-            withTimeoutOrNull(timeoutMs) {
+            withTimeoutOrNull(timeoutMs.milliseconds) {
                 runCatching { adbService.shell(":") }.isSuccess
             } ?: false
         }
@@ -166,11 +167,13 @@ internal class DeviceAdbConnectionCoordinator(
     suspend fun discoverPairingService(
         timeoutMs: Long = 12_000,
         includeLanDevices: Boolean = true,
+        matchInstanceName: String? = null,
     ): Pair<String, Int>? {
         return withContext(Dispatchers.IO) {
             adbService.discoverPairingService(
                 timeoutMs = timeoutMs,
                 includeLanDevices = includeLanDevices,
+                matchInstanceName = matchInstanceName,
             )
         }
     }
@@ -178,16 +181,20 @@ internal class DeviceAdbConnectionCoordinator(
     suspend fun discoverConnectService(
         timeoutMs: Long = 12_000,
         includeLanDevices: Boolean = true,
+        matchInstanceName: String? = null,
+        matchHostAddress: String? = null,
     ): Pair<String, Int>? {
         return withContext(Dispatchers.IO) {
             adbService.discoverConnectService(
                 timeoutMs = timeoutMs,
                 includeLanDevices = includeLanDevices,
+                matchInstanceName = matchInstanceName,
+                matchHostAddress = matchHostAddress,
             )
         }
     }
 
-    suspend fun pair(host: String, port: Int, pairingCode: String): Boolean {
+    suspend fun pair(host: String, port: Int, pairingCode: String): AdbPairingResult {
         return withContext(Dispatchers.IO) {
             val resolved = resolveHost(host)
             adbService.pair(resolved, port, pairingCode)

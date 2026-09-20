@@ -508,12 +508,12 @@ class VirtualButtonBar(
             ListPopupColumn {
                 if (destination == ActionPopupDestination.Actions)
                     spinnerItems.forEachIndexed { index, entry ->
-                        SpinnerItemImpl(
-                            entry = entry,
-                            entryCount = spinnerItems.size,
+                        DropdownImpl(
+                            item = entry,
+                            optionSize = spinnerItems.size,
                             isSelected = false,
                             index = index,
-                            spinnerColors = DropdownDefaults.dropdownColors(),
+                            dropdownColors = DropdownDefaults.dropdownColors(),
                             dialogMode = false,
                             onSelectedIndexChange = { selectedIdx ->
                                 haptic.confirm()

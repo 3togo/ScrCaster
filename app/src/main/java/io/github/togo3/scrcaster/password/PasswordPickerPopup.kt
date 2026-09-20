@@ -102,12 +102,12 @@ fun PasswordPickerPopupContent(onDismissRequest: () -> Unit) {
         }
 
         spinnerEntries.forEachIndexed { index, spinnerEntry ->
-            SpinnerItemImpl(
-                entry = spinnerEntry,
-                entryCount = spinnerEntries.size,
+            DropdownImpl(
+                item = spinnerEntry,
+                optionSize = spinnerEntries.size,
                 isSelected = false,
                 index = index,
-                spinnerColors = DropdownDefaults.dropdownColors(),
+                dropdownColors = DropdownDefaults.dropdownColors(),
                 dialogMode = false,
                 onSelectedIndexChange = ::fillPassword,
             )

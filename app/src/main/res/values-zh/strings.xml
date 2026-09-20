@@ -119,6 +119,7 @@
     <string name="device_handoff_no_port">读不到本机无线调试端口。正在打开电视接收页以便手动填写；也可先开启无线调试后重试。</string>
     <string name="device_handoff_failed">无法连接电视接收端。请保持电视上的二维码界面打开后重新扫码。</string>
     <string name="vm_scan_qr_pairing">扫描到服务 %1$s 的 adb 配对二维码</string>
+    <string name="cd_show_qr_pairing">显示配对二维码</string>
     <string name="device_quick_connect_title">连接 / 添加设备</string>
     <string name="device_status_mirroring">投屏中</string>
     <string name="device_status_resolution">分辨率</string>
@@ -178,6 +179,7 @@
 
     <!-- Settings - Theme -->
     <string name="section_theme">主题</string>
+    <string name="section_appearance">外观</string>
     <string name="pref_title_appearance_mode">外观模式</string>
     <string name="pref_summary_appearance_mode">选择应用的外观模式</string>
     <string name="pref_title_monet">Monet 颜色</string>
@@ -196,6 +198,20 @@
     <string name="pref_summary_liquid_glass">启用悬浮底栏的液态玻璃效果</string>
     <string name="pref_title_smooth_corners">平滑圆角</string>
     <string name="pref_summary_smooth_corners">启用全局平滑圆角效果</string>
+    <string name="pref_title_theme_settings">主题设置</string>
+    <string name="pref_summary_theme_settings">外观、模糊、导航等设置</string>
+    <string name="pref_blur_none">无</string>
+    <string name="pref_blur_gaussian">高斯模糊</string>
+    <string name="pref_blur_progressive">渐进模糊</string>
+    <string name="pref_title_squircle">圆角矩形</string>
+    <string name="pref_summary_squircle">在圆角 UI 元素上使用平滑的圆角矩形</string>
+    <string name="section_navigation">导航</string>
+    <string name="pref_title_transition_style">过渡风格</string>
+    <string name="pref_summary_transition_style">页面过渡动画样式</string>
+    <string name="pref_transition_style_miuix">Miuix</string>
+    <string name="pref_transition_style_aosp">AOSP</string>
+    <string name="pref_title_enable_swipe_back">横滑返回</string>
+    <string name="pref_summary_enable_swipe_back">滑动已推入的页面以返回</string>
 
     <!-- Settings - Screen Mirroring -->
     <string name="section_screen_mirroring">投屏</string>
@@ -306,6 +322,7 @@
     <string name="pref_summary_clear_logs_on_exit">双击返回退出应用时清除日志</string>
     <string name="pref_title_hide_log_box">隐藏设备页日志框</string>
     <string name="pref_summary_hide_log_box">隐藏设备页最下方的日志框</string>
+    <string name="pref_title_gamepad_device_name">虚拟手柄设备名称</string>
     <string name="pref_title_language">语言</string>
     <string name="pref_summary_language">应用显示语言</string>
 

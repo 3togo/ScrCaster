@@ -162,7 +162,7 @@ fun FullscreenControlRoute(
         onVideoSizeChanged = { width, height ->
             if (!isInPip) {
                 activity?.requestedOrientation =
-                    if ((activity as? StreamActivity)?.tvReceiverMode == true || activity?.isTelevision() == true) ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    if ((activity as? StreamActivity)?.tvReceiverMode == true || activity.isTelevision()) ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                     else fullscreenRequestedOrientation(
                         width = width,
                         height = height,

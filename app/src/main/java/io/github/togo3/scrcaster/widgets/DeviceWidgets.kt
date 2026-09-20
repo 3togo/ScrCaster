@@ -855,7 +855,7 @@ internal fun ConfigPanel(
                     text = stringResource(R.string.button_disconnect),
                     onClick = {
                         haptic.contextClick()
-                        onDisconnect?.invoke()
+                        onDisconnect.invoke()
                     },
                     modifier = Modifier.weight(sideButtonWeight),
                     enabled = !busy,

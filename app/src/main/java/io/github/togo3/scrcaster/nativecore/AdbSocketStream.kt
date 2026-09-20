@@ -7,6 +7,8 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.locks.Condition
+import java.util.concurrent.locks.ReentrantLock
 
 /**
  * Logical ADB stream abstraction mapped to a local id. Provides blocking
@@ -33,8 +35,8 @@ class AdbSocketStream(
     private val latchOk = AtomicBoolean(false)
     private val queue = LinkedBlockingQueue<Any>()
 
-    // java.lang.Object monitor: wait()/notifyAll() for flow control (Any lacks these)
-    private val writeLock = Object()
+    private val writeLock = ReentrantLock()
+    private val writeCondition: Condition = writeLock.newCondition()
 
     @Volatile
     private var inflightWrites = 0
@@ -51,9 +53,12 @@ class AdbSocketStream(
             latch.countDown()
         }
         if (flowControlWindow > 0) {
-            synchronized(writeLock) {
+            writeLock.lock()
+            try {
                 if (inflightWrites > 0) inflightWrites--
-                writeLock.notifyAll()
+                writeCondition.signalAll()
+            } finally {
+                writeLock.unlock()
             }
         }
     }
@@ -67,7 +72,8 @@ class AdbSocketStream(
         queue.offer(EndOfStreamMarker)
         latch.countDown()
         if (flowControlWindow > 0) {
-            synchronized(writeLock) { writeLock.notifyAll() }
+            writeLock.lock()
+            try { writeCondition.signalAll() } finally { writeLock.unlock() }
         }
     }
 
@@ -89,7 +95,8 @@ class AdbSocketStream(
         }
         queue.offer(EndOfStreamMarker)
         if (flowControlWindow > 0) {
-            synchronized(writeLock) { writeLock.notifyAll() }
+            writeLock.lock()
+            try { writeCondition.signalAll() } finally { writeLock.unlock() }
         }
     }
 
@@ -130,12 +137,15 @@ class AdbSocketStream(
             if (closed) throw IOException("ADB stream closed")
             if (len == 0) return
             if (flowControlWindow > 0) {
-                synchronized(writeLock) {
+                writeLock.lock()
+                try {
                     while (inflightWrites >= flowControlWindow && !closed) {
-                        writeLock.wait()
+                        writeCondition.await()
                     }
                     if (closed) throw IOException("ADB stream closed")
                     inflightWrites++
+                } finally {
+                    writeLock.unlock()
                 }
             }
             sender(A_WRTE, localId, remoteId, b.copyOfRange(off, off + len))

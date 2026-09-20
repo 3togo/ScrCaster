@@ -100,8 +100,8 @@ internal class AndroidConnectionBackend : PairingConnectionBackend {
     }
 
     override suspend fun pair(endpoint: ConnectionEndpoint, secret: String): Boolean =
-        if (secret.matches(Regex("[0-9]{6}"))) coordinator.pair(endpoint.host, endpoint.port, secret)
-        else pairQrSecret(secret) { coordinator.pair(endpoint.host, endpoint.port, it) }
+        if (secret.matches(Regex("[0-9]{6}"))) coordinator.pair(endpoint.host, endpoint.port, secret).success
+        else pairQrSecret(secret) { coordinator.pair(endpoint.host, endpoint.port, it).success }
 
     override suspend fun findQrService(name: String) = runInterruptible(Dispatchers.IO) {
         AdbMdnsDiscoverer.discoverQrService(name, 120_000)?.let { ConnectionEndpoint(it.first, it.second) }

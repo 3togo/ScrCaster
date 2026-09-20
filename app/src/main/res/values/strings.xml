@@ -99,7 +99,7 @@
     <string name="device_pair_qr_timeout">No device detected after the scan. Confirm both devices are on the same Wi‑Fi subnet—not a guest network—keep Wireless debugging enabled, and disable VPN, hotspot/client isolation, or multicast UDP 5353 filtering. Then show a new QR code or use a pairing code.</string>
     <string name="device_pair_qr_paired_no_address">Paired. Enter the wireless debugging address shown on that device, then connect.</string>
     <string name="device_pair_qr_connected">Paired. Connecting to %1$s…</string>
-    <string name="device_pair_qr_retry">Show a new QR code</string>
+    <string name="device_pair_qr_retry">Show a new QR code</string>>
     <string name="device_pair_qr_code_instead">Use the pairing code instead</string>
     <string name="device_scan_qr_title">Scan a QR code</string>
     <string name="device_scan_qr_summary">Read an address or pairing code from another screen</string>
@@ -114,11 +114,12 @@
     <string name="device_scan_qr_pairing_fallback">Could not pair with the scanned code. Opening system settings; you can also use the pairing code.</string>
     <string name="device_scan_qr_pairing_started">Pairing with the scanned device…</string>
     <string name="device_scan_qr_pairing_unsupported">Could not open a system settings page. Open Developer options → Wireless debugging manually, or use the pairing code.</string>
-    <string name="device_handoff_sending">Sending this phone’s Wireless debugging address to the TV…</string>
+    <string name="device_handoff_sending">Sending this phone\'s Wireless debugging address to the TV…</string>
     <string name="device_handoff_sent">Address sent. The TV is connecting…</string>
-    <string name="device_handoff_no_port">Could not read this phone’s Wireless debugging port. Opening the receiver page to enter it manually; alternatively turn Wireless debugging on and retry.</string>
+    <string name="device_handoff_no_port">Could not read this phone\'s Wireless debugging port. Opening the receiver page to enter it manually; alternatively turn Wireless debugging on and retry.</string>
     <string name="device_handoff_failed">Could not reach the TV receiver. Keep its QR screen open, then scan again.</string>
     <string name="vm_scan_qr_pairing">Scanned an adb pairing QR for service %1$s</string>
+    <string name="cd_show_qr_pairing">Show pairing QR code</string>
     <string name="device_quick_connect_title">Connect / Add device</string>
     <string name="device_status_mirroring">Mirroring</string>
     <string name="device_status_resolution">Resolution</string>
@@ -179,6 +180,7 @@
 
     <!-- Settings - Theme -->
     <string name="section_theme">Theme</string>
+    <string name="section_appearance">Appearance</string>
     <string name="pref_title_appearance_mode">Appearance mode</string>
     <string name="pref_summary_appearance_mode">Select the app\'s appearance mode</string>
     <string name="pref_title_monet">Monet color</string>
@@ -197,6 +199,20 @@
     <string name="pref_summary_liquid_glass">Enable liquid glass effect on the floating bottom bar</string>
     <string name="pref_title_smooth_corners">Smooth corners</string>
     <string name="pref_summary_smooth_corners">Enable global smooth corner effect</string>
+    <string name="pref_title_theme_settings">Theme settings</string>
+    <string name="pref_summary_theme_settings">Appearance, blur, navigation and more</string>
+    <string name="pref_blur_none">None</string>
+    <string name="pref_blur_gaussian">Gaussian blur</string>
+    <string name="pref_blur_progressive">Progressive blur</string>
+    <string name="pref_title_squircle">Enable squircle shapes</string>
+    <string name="pref_summary_squircle">Use smooth squircle corners on rounded UI elements</string>
+    <string name="section_navigation">Navigation</string>
+    <string name="pref_title_transition_style">Transition Style</string>
+    <string name="pref_summary_transition_style">Page transition animation style</string>
+    <string name="pref_transition_style_miuix">Miuix</string>
+    <string name="pref_transition_style_aosp">AOSP</string>
+    <string name="pref_title_enable_swipe_back">Enable Swipe Back</string>
+    <string name="pref_summary_enable_swipe_back">Swipe a pushed page to pop it; direction follows layout</string>
 
     <!-- Settings - Screen Mirroring -->
     <string name="section_screen_mirroring">Screen mirroring</string>
@@ -307,6 +323,7 @@
     <string name="pref_summary_clear_logs_on_exit">Clear logs when double-pressing back to exit the app</string>
     <string name="pref_title_hide_log_box">Hide device page log box</string>
     <string name="pref_summary_hide_log_box">Hide the log box at the bottom of the device page</string>
+    <string name="pref_title_gamepad_device_name">Virtual gamepad device name</string>
     <string name="pref_title_language">Language</string>
     <string name="pref_summary_language">App display language</string>
 

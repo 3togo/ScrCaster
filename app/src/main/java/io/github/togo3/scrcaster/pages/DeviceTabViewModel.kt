@@ -3,7 +3,9 @@ package io.github.togo3.scrcaster.pages
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.SystemClock
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -23,6 +25,7 @@ import io.github.togo3.scrcaster.models.DeviceConnectionType
 import io.github.togo3.scrcaster.models.DeviceShortcut
 import io.github.togo3.scrcaster.models.DeviceShortcuts
 import io.github.togo3.scrcaster.nativecore.AdbMdnsDiscoverer
+import io.github.togo3.scrcaster.nativecore.QrPairingCredentials
 import io.github.togo3.scrcaster.nativecore.UsbAdbSession
 import io.github.togo3.scrcaster.nativecore.UsbDeviceInfo
 import io.github.togo3.scrcaster.nativecore.pairQrSecret
@@ -60,6 +63,13 @@ private const val QR_PAIRING_PORT_DISCOVERY_TIMEOUT_MS = 12_000L
 // 反向扫码: 对端配对服务只在其配对窗口内广播, 拿不到名称就无需再等满 120 秒
 private const val QR_SCAN_DISCOVERY_TIMEOUT_MS = 20_000L
 private const val TAG = "DeviceTabViewModel"
+
+// 扫码配对: 手机停留在扫码页期间服务才存在, 因此由客户端决定整体等待预算
+private const val QR_PAIRING_TOTAL_TIMEOUT_MS = 120_000L
+private const val QR_PAIRING_DISCOVERY_WINDOW_MS = 4_000L
+private const val QR_PAIRING_RETRY_MIN_MS = 1_000L
+private const val QR_PAIRING_RETRY_MAX_MS = 3_000L
+private const val QR_PAIRING_CONNECT_DISCOVERY_MS = 8_000L
 
 @OptIn(FlowPreview::class)
 internal class DeviceTabViewModel(
@@ -541,15 +551,11 @@ internal class DeviceTabViewModel(
         cause: DisconnectCause = DisconnectCause.User,
         statusLine: String = "Disconnected",
     ) {
-        val result = connectionController.disconnectAdbConnection(
+        connectionController.disconnectAdbConnection(
             clearQuickOnlineForTarget,
             cause,
             statusLine,
         )
-        result.clearedTarget?.let { target ->
-            if (target.host.isNotBlank())
-                _savedShortcuts.update { it.update(host = target.host, port = target.port) }
-        }
         logMessage?.let { logEvent(it) }
     }
 
@@ -557,8 +563,6 @@ internal class DeviceTabViewModel(
         val disconnected = connectionController.disconnectCurrentTargetBeforeConnecting(newHost, newPort)
             ?: return
         sessionReconnectBlacklistHosts += disconnected.host
-        if (disconnected.host.isNotBlank())
-            _savedShortcuts.update { it.update(host = disconnected.host, port = disconnected.port) }
     }
 
     suspend fun connectWithTimeout(host: String, port: Int) {
@@ -731,12 +735,11 @@ internal class DeviceTabViewModel(
 
         applyConnectedDeviceCapabilities(info.sdkInt)
 
-        // USB 的 host 是 VID/PID; 快捷方式地址本身带 usb: 前缀 (解析后 host 即 VID/PID),
-        // 这里必须用原始 host 查找才能命中并更新名称
+        // 端口是临时的: 按 host 定位条目, 否则端口不一致时 (如 mDNS 换了端口) 名字会静默写不进去
+        // USB 的 host 是 VID/PID; 快捷方式地址本身带 usb: 前缀 (解析后 host 即 VID/PID), 同样按 host 命中
         _savedShortcuts.update {
-            it.update(
+            it.updateNameByHost(
                 host = host,
-                port = port,
                 name = fullLabel,
                 updateNameOnlyWhenEmpty = true,
             )
@@ -841,11 +844,7 @@ internal class DeviceTabViewModel(
 
         if (options.killAdbOnClose) {
             currentTarget.value?.host?.let { sessionReconnectBlacklistHosts += it }
-            val result = connectionController.stopScrcpySession(killAdbOnClose = true)
-            result.clearedTarget?.let { target ->
-                if (target.host.isNotBlank())
-                    _savedShortcuts.update { it.update(host = target.host, port = target.port) }
-            }
+            connectionController.stopScrcpySession(killAdbOnClose = true)
             logEvent(R.string.vm_scrcpy_stopped_adb_disconnected_log)
             AppRuntime.snackbar(R.string.vm_scrcpy_stopped_adb_disconnected)
         } else {
@@ -1015,7 +1014,7 @@ internal class DeviceTabViewModel(
             val h = host.trim()
             val p = port.trim().toIntOrNull() ?: return@runBusy
             val c = code.trim()
-            val ok = adbCoordinator.pair(h, p, c)
+            val ok = adbCoordinator.pair(h, p, c).success
             logEvent(
                 if (ok) R.string.vm_pairing_succeeded else R.string.vm_pairing_failed,
                 level = if (ok) Log.INFO else Log.ERROR,
@@ -1103,7 +1102,7 @@ internal class DeviceTabViewModel(
         }
 
         override suspend fun pair(host: String, port: Int, secret: String) =
-            pairQrSecret(secret) { adbCoordinator.pair(host, port, it) }
+            pairQrSecret(secret) { adbCoordinator.pair(host, port, it).success }
 
         override suspend fun findConnection(host: String) = runInterruptible(Dispatchers.IO) {
             AdbMdnsDiscoverer.discoverConnectForHost(host, QR_PAIRING_PORT_DISCOVERY_TIMEOUT_MS)
@@ -1325,13 +1324,7 @@ internal class DeviceTabViewModel(
                     )
                 },
                 onMdnsPortChanged = { host, oldPort, newPort ->
-                    _savedShortcuts.update {
-                        it.update(
-                            host = host,
-                            port = oldPort,
-                            newPort = newPort,
-                        )
-                    }
+                    _savedShortcuts.update { it.upsertByHost(host, newPort) }
                     logEvent(R.string.vm_mdns_updated, host, oldPort, newPort)
                 },
                 onKnownDeviceReconnected = { target ->
@@ -1339,7 +1332,8 @@ internal class DeviceTabViewModel(
                     logEvent(R.string.vm_quick_probe_success, target.host, target.port)
                 },
                 onDiscoveredDeviceReconnected = { host, port, _ ->
-                    _savedShortcuts.update { it.update(host = host, port = port) }
+                    // 列表里存的是旧端口, 按 host 覆盖端口
+                    _savedShortcuts.update { it.upsertByHost(host, port) }
                     logEvent(R.string.vm_quick_probe_success, host, port)
                 },
                 retryIntervalMs = ADB_AUTO_RECONNECT_RETRY_INTERVAL_MS,
@@ -1610,7 +1604,7 @@ internal class DeviceTabViewModel(
         }
     }
 
-    class Factory(
+    internal class Factory(
         private val scrcpy: Scrcpy,
         private val connectionServices: DeviceConnectionServices,
     ): ViewModelProvider.Factory {
